@@ -82,9 +82,17 @@ if(brick.getNumber()>0) {
 
         }
         //balls
+        String color = GamePlayFrame.getColor();
+        Color color1 = switch (color) {
+            case "Red" -> Color.RED;
+            case "Blue" -> Color.BLUE;
+            case "Cyan" -> Color.CYAN;
+            default -> null;
+        };
+
 
         for (Ball ball : Ball.getBalls()) {
-            g.setColor(Color.CYAN);
+            g.setColor(color1);
             g.fillOval(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
 
         }
@@ -257,13 +265,14 @@ if(brick.getNumber()>0) {
 //                System.out.println("ball: "+ball.getBallYPose()+"/"+ball.getBallYPose());
 //
 //                System.out.println("brick: "+brick.gety()+"/"+brick.getx());
-                Rectangle rect = new Rectangle(brick.getx(),brick.gety(),60,40);
-                if(ball.intersects(rect)){
+                if(brick.getNumber()>0) {
+                    Rectangle rect = new Rectangle(brick.getx(), brick.gety(), 60, 40);
+                    Rectangle rect2 = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
 
-
-                    System.out.println(1111);
-                    ballXDir = -1*ballXDir;
-                    ballYDir = -1*ballYDir;
+                    if (rect.intersects(rect2)) {
+                        //    System.out.println(1111);
+                        ballXDir = -1 * ballXDir;
+                        ballYDir = -1 * ballYDir;
 //                    if(brick.getNumber() == 1){
 //                        Brick.getBricks().remove(brick);
 //                        repaint();
@@ -271,9 +280,11 @@ if(brick.getNumber()>0) {
 //
 //                    }else {
                         brick.setNumber(brick.getNumber() - 1);
-                        repaint();
- //                   }
 
+                        repaint();
+                        //                   }
+
+                    }
                 }
             }
         }

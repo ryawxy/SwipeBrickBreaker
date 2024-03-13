@@ -27,10 +27,11 @@ public class StarterFrame extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 dispose();
 
-               //  new GamePlayFrame();
-                new GameFrame();
+                 new GamePlayFrame();
+             //   new GameFrame();
 
             }
         });
