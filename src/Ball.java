@@ -28,6 +28,7 @@ public class Ball extends Rectangle {
 
     public static void setInitialBalls(){
         balls.add(new Ball(150,590,10,10));
+
     }
 
 

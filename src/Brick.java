@@ -9,26 +9,28 @@ public class Brick extends Rectangle {
     private int x;
 
     private int y;
-    private int width;
-    private int height;
+    private double width;
+    private double height;
     private int number;
+    private int feature;
     private static final ArrayList<Brick> bricks = new ArrayList<>();
 
     Timer timer;
 
-    public Brick(int x,int y, int width, int height, int number) {
+    public Brick(int x,int y, double width, double height, int number, int feature) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.number = number;
+        this.feature = feature;
 
     }
 
     public static void setInitialBricks(){
 
-        Brick brick1 = new Brick(0,0,60,40,2);
-        Brick brick2 = new Brick(300,0,60,40,1);
+        Brick brick1 = new Brick(0,0,60,40,2,0);
+        Brick brick2 = new Brick(300,0,60,40,1,0);
 
         bricks.add(brick1);
         bricks.add(brick2);
@@ -43,8 +45,8 @@ public class Brick extends Rectangle {
     public void addBrick(){
 
             Random rand = new Random();
-            Brick.getBricks().add(new Brick(0,0,60,40,rand.nextInt(Brick.getBricks().size()+1)));
-            Brick.getBricks().add(new Brick(300,0,60,40,rand.nextInt(Brick.getBricks().size()+1)));
+            Brick.getBricks().add(new Brick(0,0,60,40,rand.nextInt(Brick.getBricks().size()+1),rand.nextInt(3)));
+            Brick.getBricks().add(new Brick(300,0,60,40,rand.nextInt(Brick.getBricks().size()+1),rand.nextInt(3)));
         }
 
 
@@ -58,11 +60,11 @@ public class Brick extends Rectangle {
         }, 10000);
     }
 
-    public int getW() {
+    public double getW() {
         return width;
     }
 
-    public int getH() {
+    public double getH() {
         return height;
     }
 
@@ -70,11 +72,11 @@ public class Brick extends Rectangle {
         return number;
     }
 
-    public void setWidth(int width) {
+    public void setW(double width) {
         this.width = width;
     }
 
-    public void setHeight(int height) {
+    public void setH(double height) {
         this.height = height;
     }
 
@@ -98,4 +100,9 @@ public class Brick extends Rectangle {
     public void setY(int y) {
         this.y = y;
     }
+
+    public int getFeature() {
+        return feature;
+    }
+
 }
