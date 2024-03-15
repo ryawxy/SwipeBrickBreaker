@@ -22,11 +22,11 @@ public class GamePlayFrame extends JFrame {
 
    JButton start;
 
+   JLabel level;
+   private static String chosenLevel;
   private static  String chosenColor;
-
-   String enteredName;
-
-   JComboBox<String> colorSelection ;
+  JComboBox<String> levelSelection;
+  JComboBox<String> colorSelection ;
     public GamePlayFrame(){
 
         super.setTitle("Brick Breaker");
@@ -61,10 +61,29 @@ public class GamePlayFrame extends JFrame {
             }
         });
 
+        level = new JLabel("Choose a level");
+        level.setBounds(300,240,200,100);
+        panel.add(level);
+        levelSelection = new JComboBox<>();
+        levelSelection.addItem("easy");
+        levelSelection.addItem("medium");
+        levelSelection.addItem("hard");
+        levelSelection.setBackground(Color.lightGray);
+        levelSelection.setBounds(300,320,80,30);
+        panel.add(levelSelection);
+        levelSelection.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chosenLevel = (String) levelSelection.getSelectedItem();
+            }
+        });
+
+
+
 
 
         start = new JButton("Start");
-        start.setBounds(300,300,80,30);
+        start.setBounds(300,500,80,30);
         panel.add(start);
         System.out.println(chosenColor);
 
@@ -90,5 +109,9 @@ public class GamePlayFrame extends JFrame {
     }
     public static String getColor(){
         return chosenColor;
+    }
+
+    public static String getChosenLevel() {
+        return chosenLevel;
     }
 }

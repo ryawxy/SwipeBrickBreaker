@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     private final int ballSize = 10;
 
-    Brick brick = new Brick(0,0,0,0,0,0);
+    Brick brick = new Brick(0, 0, 0, 0, 0, 0);
 
     Timer timer;
 
@@ -45,7 +45,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     Thread thread;
 
-    private int score = numberofBricks - time/5;
+    private int score = numberofBricks - time / 5;
 
     boolean showDialog = true;
     boolean gameOver = false;
@@ -64,7 +64,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     Random rand = new Random();
     int timeLeft2;
     int endTurn = 0;
-    Item item = new Item(0,0,0,0,0);
+    Item item = new Item(0, 0, 0, 0, 0);
     int itemSize = 30;
     boolean speed = false;
     int timeLeft4 = 0;
@@ -75,6 +75,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     boolean hasReleased = false;
 
     boolean goUP = false;
+    int numberOfBalls;
 
     public GamePanel() {
 
@@ -90,7 +91,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         thread = new Thread(this);
         thread.start();
 
-        timer= new Timer(8000, new ActionListener() {
+        timer = new Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 time++;
@@ -104,13 +105,13 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         timer3 = new Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(!turn) {
+                if (!turn) {
                     item.addItem();
                     repaint();
                 }
             }
         });
-timer3.start();
+        timer3.start();
 //        if(showDialog) {
 //            timer2 = new Timer(100, new ActionListener() {
 //
@@ -166,12 +167,12 @@ timer3.start();
                     g.setColor(new Color(rand.nextInt(100), rand.nextInt(100), rand.nextInt(100)));
                 }
 
-                    g.fillRect(brick.getx(), brick.gety(), (int) brick.getW(), (int) brick.getH());
+                g.fillRect(brick.getx(), brick.gety(), (int) brick.getW(), (int) brick.getH());
 
-                    g.setColor(Color.BLACK);
-                    Font font = new Font("Arial", Font.BOLD, 20);
-                    g.setFont(font);
-                    g.drawString(Integer.toString(brick.getNumber()), brick.getx() + 20, brick.gety() + 25);
+                g.setColor(Color.BLACK);
+                Font font = new Font("Arial", Font.BOLD, 20);
+                g.setFont(font);
+                g.drawString(Integer.toString(brick.getNumber()), brick.getx() + 20, brick.gety() + 25);
 
             }
 
@@ -212,8 +213,8 @@ timer3.start();
 
         //draw items
 
-        for(Item item1 : Item.getItems()) {
-            if (item1.getFeature() <= 5  && item1.getFeature()> 0) {
+        for (Item item1 : Item.getItems()) {
+            if (item1.getFeature() <= 5 && item1.getFeature() > 0) {
                 if (item1.getFeature() == 1) {
                     g.setColor(new Color(160, 32, 200));
                 } else if (item1.getFeature() == 2) {
@@ -223,7 +224,7 @@ timer3.start();
 
                 } else if (item1.getFeature() == 4) {
                     g.setColor(new Color(255, 165, 51));
-                }else if(item1.getFeature() == 5){
+                } else if (item1.getFeature() == 5) {
                     g.setColor(Color.BLACK);
                 }
                 g.fillOval(item1.getx(), item1.gety(), itemSize, itemSize);
@@ -243,87 +244,110 @@ timer3.start();
 //        }
     }
 
-    public void moveItems(){
-    if(!turn) {
-        for (Item item1 : Item.getItems()) {
+    public void moveItems() {
+        if (!turn) {
+            for (Item item1 : Item.getItems()) {
 
-            item1.setY(item1.gety() + 1);
+                item1.setY(item1.gety() + 1);
+            }
         }
-    }
     }
 
     public void moveBricks() {
-//if(endTurn == 1){
-//        for(Brick brick1 : Brick.getBricks()) {
-//
-//            brick1.setY(brick1.gety() + 30);
-//            endTurn = 0;
-//        }
-//        }
 
-        if(hasPlayed() && !goUP){
+        if (hasPlayed() && !goUP) {
 
-            for(Brick brick1 : Brick.getBricks()){
-                brick1.setY(brick1.gety()+60);
+            for (Brick brick1 : Brick.getBricks()) {
+                brick1.setY(brick1.gety() + 60);
                 hasReleased = false;
             }
-        }if(hasPlayed() && goUP){
+        }
+        if (hasPlayed() && goUP) {
 
-            for(Brick brick1 : Brick.getBricks()){
-                brick1.setY(brick1.gety()-800);
+            for (Brick brick1 : Brick.getBricks()) {
+                brick1.setY(brick1.gety() - 800);
             }
             goUP = false;
             hasReleased = false;
         }
-        if(!turn && !hasPlayed()){
+        if (!turn && !hasPlayed()) {
+            if(GamePlayFrame.getChosenLevel().equals("easy")){
             for (Brick brick : Brick.getBricks()) {
                 brick.setY(brick.gety() + 1);
+            }
+            }else if(GamePlayFrame.getChosenLevel().equals("medium")){
+                for (Brick brick : Brick.getBricks()) {
+                    brick.setY(brick.gety() + 2);
+                }
+                }
+            else if(GamePlayFrame.getChosenLevel().equals("hard")){
+                for (Brick brick : Brick.getBricks()) {
+                    brick.setY(brick.gety() + 3);
+                }
+            }
             }
 
 
         }
-        }
 
-    public void changeSize(){
+
+    public void changeSize() {
 
         int y = 0;
-        if(earthquake){
+        if (earthquake) {
             DELTA_X = 0.6;
             DELTA_Y = 0.6;
         }
         Random rand = new Random();
-        for(Brick brick : Brick.getBricks()){
+        for (Brick brick : Brick.getBricks()) {
             int x = rand.nextInt(2);
-            if(x == 0){
-                y=1;
-            }else{
+            if (x == 0) {
+                y = 1;
+            } else {
                 y = -1;
             }
-            brick.setW( (brick.getW()+DELTA_X*y));
-            brick.setH( (brick.getH()+DELTA_Y*y));
+            brick.setW((brick.getW() + DELTA_X * y));
+            brick.setH((brick.getH() + DELTA_Y * y));
         }
     }
 
     public void moveBalls() {
 
+//        int x = 0;
+//        int y = 0;
+//        if(numberOfBalls>1 && hasPlayed()){
+//            for(Ball ball : Ball.getBalls()){
+//                if(ball.getBallYPose()>= 590){
+//                    x = ball.getBallXPos();
+//                    y = ball.getBallYPose();
+//                    break;
+//                }
+//                break;
+//            }
+//            for(Ball ball : Ball.getBalls()){
+//                ball.setBallXPos(x);
+//                ball.setBallYPose(y);
+//            }
+//        }
+
         Ball ball2 = Ball.getBalls().getFirst();
 
-        if(mouseYPose-mouseYPose2!=0 || mouseXPos-mouseXPos2 != 0){
-            if(!speed && !dizzy) {
+        if (mouseYPose - mouseYPose2 != 0 || mouseXPos - mouseXPos2 != 0) {
+            if (!speed && !dizzy) {
                 ballXDir = (mouseXPos2 - ball2.getBallXPos()) / 8;
                 ballYDir = (mouseYPose2 - ball2.getBallYPose()) / 8;
             }
-            if(speed && !dizzy){
-                ballXDir =  (mouseXPos2 -ball2.getBallXPos() )/5;
-                ballYDir =  (mouseYPose2 - ball2.getBallYPose())/5;
+            if (speed && !dizzy) {
+                ballXDir = (mouseXPos2 - ball2.getBallXPos()) / 5;
+                ballYDir = (mouseYPose2 - ball2.getBallYPose()) / 5;
             }
-            if(dizzy){
+            if (dizzy) {
 
 //                int x = rand.nextInt(50);
 //                int y = rand.nextInt(50);
 //                ballXDir =  (x -ball2.getBallXPos() )/8;
 //                ballYDir =  (y - ball2.getBallYPose())/8;
-                ballXDir = -1*(mouseXPos2 - ball2.getBallXPos()) / 8;
+                ballXDir = -1 * (mouseXPos2 - ball2.getBallXPos()) / 8;
                 ballYDir = (mouseYPose2 - ball2.getBallYPose()) / 8;
 
                 for (Ball ball : Ball.getBalls()) {
@@ -333,7 +357,10 @@ timer3.start();
             }
 
         }
-        if(!stop() && !dizzy) {
+        if (numberOfBalls > 1) {
+            Ball.getBalls().add(new Ball(Ball.getBalls().getFirst().getBallXPos() + ballXDir, Ball.getBalls().getFirst().getBallYPose() + ballYDir, ballSize, ballSize));
+        }
+        if (!stop() && !dizzy) {
             for (Ball ball : Ball.getBalls()) {
                 ball.setBallXPos(ball.getBallXPos() + ballXDir);
                 ball.setBallYPose(ball.getBallYPose() + ballYDir);
@@ -347,26 +374,28 @@ timer3.start();
             if (ball.getBallYPose() <= 0) {
                 ballYDir = -1 * ballYDir;
             }
-        dizzy = false;
+            dizzy = false;
 
         }
 
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
         moveBricks();
         moveBalls();
         checkCollision();
-
         repaint();
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
 
     @Override
-    public void mousePressed(MouseEvent e) {}
+    public void mousePressed(MouseEvent e) {
+    }
 
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -381,15 +410,18 @@ timer3.start();
                 ball.setBallYPose(mouseYPose);
             }
 
-
             repaint();
         }
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
+
     @Override
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
+
     public void invisible() {
 
         if (disco) {
@@ -400,9 +432,7 @@ timer3.start();
                 }
             }
         }
-
     }
-
 
     @Override
     public void run() {
@@ -425,45 +455,45 @@ timer3.start();
                     moveItems();
                     checkCollision();
                     hasPlayed();
-                    addBall();
 
 
-                    if(earthquake){
+
+                    if (earthquake) {
                         changeSize();
                         timeLeft++;
                     }
-                    if(timeLeft >= 400){
+                    if (timeLeft >= 400) {
                         earthquake = false;
 
                         timeLeft = 0;
                     }
 
-                    if(disco){
+                    if (disco) {
                         invisible();
                         timeLeft2++;
                     }
-                    if(timeLeft2 >= 400){
+                    if (timeLeft2 >= 400) {
                         disco = false;
                         timeLeft2 = 0;
                     }
 
-                    if(speed){
+                    if (speed) {
                         timeLeft4++;
                     }
-                    if(timeLeft4 >= 500){
+                    if (timeLeft4 >= 500) {
                         speed = false;
                         timeLeft4 = 0;
                     }
-                    if (strength){
+                    if (strength) {
                         timeLeft5++;
                     }
-                    if(timeLeft5 >= 500){
+                    if (timeLeft5 >= 500) {
                         timeLeft5 = 0;
                         strength = false;
                     }
 
-                    System.out.println(Ball.getBalls().size());
-
+                    System.out.println("first: " + Ball.getBalls().getFirst().getBallXPos());
+                    System.out.println("second: " + Ball.getBalls().getLast().getBallXPos());
 
 
 //                    if(endTurn == 1){
@@ -472,7 +502,7 @@ timer3.start();
 //                        }
 //                        endTurn = 0;
 //                    }
-                   repaint();
+                    repaint();
                     delta--;
 
                 }
@@ -482,16 +512,17 @@ timer3.start();
 
     public boolean stop() {
         for (Ball ball : Ball.getBalls()) {
-        return ball.getBallYPose()  >= GAME_HEIGHT - ballSize;
+            return ball.getBallYPose() >= GAME_HEIGHT - ballSize;
         }
         return false;
     }
-    public void checkCollision(){
 
-        for(Ball ball : Ball.getBalls()){
-            for(Brick brick : Brick.getBricks()){
+    public void checkCollision() {
 
-                if(brick.getNumber()>0) {
+        for (Ball ball : Ball.getBalls()) {
+            for (Brick brick : Brick.getBricks()) {
+
+                if (brick.getNumber() > 0) {
                     Rectangle rect = new Rectangle(brick.getx(), brick.gety(), 60, 40);
                     Rectangle rect2 = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
 
@@ -500,19 +531,20 @@ timer3.start();
                         ballXDir = -1 * ballXDir;
                         ballYDir = -1 * ballYDir;
 
-                        if(brick.getNumber() == 1){
+                        if (brick.getNumber() == 1) {
                             numberofBricks++;
-                            if(brick.getFeature() == 1){
+                            if (brick.getFeature() == 1) {
                                 earthquake = true;
 
 
                             }
-                            if(brick.getFeature() == 2){
+                            if (brick.getFeature() == 2) {
                                 disco = true;
                             }
-                        }if(!strength) {
+                        }
+                        if (!strength) {
                             brick.setNumber(brick.getNumber() - 1);
-                        }else{
+                        } else {
                             brick.setNumber(brick.getNumber() - 2);
                         }
 
@@ -522,33 +554,33 @@ timer3.start();
                 }
             }
         }
-        for(Ball ball : Ball.getBalls()) {
+        for (Ball ball : Ball.getBalls()) {
             for (Item item1 : Item.getItems()) {
-                if(item1.getFeature()<= 5 && item1.getFeature()>0){
-                Rectangle rect = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
-                Rectangle rect2 = new Rectangle(item1.getx(), item1.gety(), itemSize, itemSize);
+                if (item1.getFeature() <= 5 && item1.getFeature() > 0) {
+                    Rectangle rect = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
+                    Rectangle rect2 = new Rectangle(item1.getx(), item1.gety(), itemSize, itemSize);
 
-                if (rect.intersects(rect2)) {
-                    ballXDir = -1 * ballXDir;
-                    ballYDir = -1 * ballYDir;
-                    if (item1.getFeature() == 2) {
-                        speed = true;
-                        item1.setFeature(10);
-                    }
-                    if (item1.getFeature() == 3) {
-                        strength = true;
-                        item1.setFeature(10);
+                    if (rect.intersects(rect2)) {
+                        ballXDir = -1 * ballXDir;
+                        ballYDir = -1 * ballYDir;
+                        if (item1.getFeature() == 2) {
+                            speed = true;
+                            item1.setFeature(10);
+                        }
+                        if (item1.getFeature() == 3) {
+                            strength = true;
+                            item1.setFeature(10);
 
+                        }
+                        if (item1.getFeature() == 4) {
+                            dizzy = true;
+                            item1.setFeature(10);
+                        }
+                        if (item1.getFeature() == 5) {
+                            goUP = true;
+                            item1.setFeature(10);
+                        }
                     }
-                    if (item1.getFeature() == 4) {
-                        dizzy = true;
-                        item1.setFeature(10);
-                    }
-                    if(item1.getFeature() == 5){
-                        goUP = true;
-                        item1.setFeature(10);
-                    }
-                }
                     repaint();
                 }
 
@@ -558,37 +590,38 @@ timer3.start();
 
     @Override
     public void mouseDragged(MouseEvent e) {
-if(!turn) {
+        if (!turn) {
 
-        mouseXPos2 = e.getX();
-        mouseYPose2 = e.getY();
+            mouseXPos2 = e.getX();
+            mouseYPose2 = e.getY();
 
 
-}
+        }
 
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+    }
 
-    public void changePosition(){
-        for(Ball ball : Ball.getBalls()){
-    //        if(hasMoved()){
-                if(ball.getBallYPose() >= 590 && ball.getBallXPos()!=150){
-                    INITIAL_XPOSITION = ball.getBallXPos();
-                    INITIAL_YPOSITION = ball.getBallYPose();
-                    break;
-                }
+    public void changePosition() {
+        for (Ball ball : Ball.getBalls()) {
+            //        if(hasMoved()){
+            if (ball.getBallYPose() >= 590 && ball.getBallXPos() != 150) {
+                INITIAL_XPOSITION = ball.getBallXPos();
+                INITIAL_YPOSITION = ball.getBallYPose();
+                break;
             }
-     //   }
-        for(Ball ball : Ball.getBalls()){
+        }
+        //   }
+        for (Ball ball : Ball.getBalls()) {
             ball.setBallXPos(INITIAL_XPOSITION);
             ball.setBallYPose(INITIAL_YPOSITION);
         }
-        Ball.getBalls().add(new Ball(INITIAL_XPOSITION,INITIAL_YPOSITION,ballSize,ballSize));
+        Ball.getBalls().add(new Ball(INITIAL_XPOSITION, INITIAL_YPOSITION, ballSize, ballSize));
     }
 
- //   public boolean hasMoved(){
+    //   public boolean hasMoved(){
 //        for(Ball ball : Ball.getBalls()){
 //            if(ball.getBallXPos() != INITIAL_XPOSITION || ball.getBallYPose() != INITIAL_YPOSITION){
 //                return true;
@@ -596,44 +629,35 @@ if(!turn) {
 //            }
 //        }
 //        return false;
- //   }
+    //   }
 
-    public void checkTurn(){
-        for(Ball ball : Ball.getBalls()){
-            if(ball.getBallYPose() < 590){
+    public void checkTurn() {
+        for (Ball ball : Ball.getBalls()) {
+            if (ball.getBallYPose() < 590) {
                 turn = true;
                 endTurn = 0;
-            }else{
+            } else {
                 turn = false;
 
-                }
-            if(ball.getBallYPose()>= 570){
+            }
+            if (ball.getBallYPose() >= 570) {
                 endTurn = 1;
             }
-            }
         }
-        public boolean hasPlayed(){
+    }
 
-        for(Ball ball : Ball.getBalls()){
-            if(ball.getBallYPose()>= 585 && hasReleased){
-                Ball ball1 = Ball.getBalls().getFirst();
+    public boolean hasPlayed() {
 
-                Ball.getBalls().add(new Ball(ball1.getBallXPos(),ball1.getBallYPose(),ballSize,ballSize));
+        for (Ball ball : Ball.getBalls()) {
+            if (ball.getBallYPose() >= 585 && hasReleased) {
+                numberOfBalls++;
+
                 return true;
             }
         }
         return false;
-        }
-
-        public void addBall(){
-        if(hasPlayed()){
-            System.out.println("trueeee");
-          Ball ball = Ball.getBalls().getFirst();
-
-            Ball.getBalls().add(new Ball(ball.getBallXPos(),ball.getBallYPose(),ballSize,ballSize));
-
-        }
-        }
     }
+}
+
 
 

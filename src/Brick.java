@@ -42,12 +42,29 @@ public class Brick extends Rectangle {
 
     }
 
-    public void addBrick(){
+    public void addBrick() {
 
+        if (GamePlayFrame.getChosenLevel().equals("medium")) {
             Random rand = new Random();
-            Brick.getBricks().add(new Brick(0,0,60,40,rand.nextInt(Brick.getBricks().size()+1),rand.nextInt(3)));
-            Brick.getBricks().add(new Brick(300,0,60,40,rand.nextInt(Brick.getBricks().size()+1),rand.nextInt(3)));
+            int x = rand.nextInt(400)+100;
+            Brick.getBricks().add(new Brick(0, 0, 60, 40, rand.nextInt(Brick.getBricks().size() + 1), rand.nextInt(8)));
+            Brick.getBricks().add(new Brick(x, 0, 60, 40, rand.nextInt(Brick.getBricks().size() + 1), rand.nextInt(8)));
+
+
+        }else if(GamePlayFrame.getChosenLevel().equals("hard")){
+            Random rand = new Random();
+            int x = rand.nextInt(250)+300;
+            int x2 = rand.nextInt(100)+70;
+            Brick.getBricks().add(new Brick(0, 0, 60, 40, rand.nextInt(Brick.getBricks().size() + 2), rand.nextInt(8)));
+            Brick.getBricks().add(new Brick(x, 0, 60, 40, rand.nextInt(Brick.getBricks().size() + 2), rand.nextInt(10)));
+            Brick.getBricks().add(new Brick(x2, 0, 60, 40, rand.nextInt(Brick.getBricks().size() + 2), rand.nextInt(9)));
+
+        }else if(GamePlayFrame.getChosenLevel().equals("easy")){
+            Random rand = new Random();
+            int x = rand.nextInt(500);
+            Brick.getBricks().add(new Brick(x, 0, 60, 40, rand.nextInt(Brick.getBricks().size() + 1), rand.nextInt(5)));
         }
+    }
 
 
     public void loop(){
