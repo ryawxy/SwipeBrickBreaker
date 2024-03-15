@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 public class GamePlayFrame extends JFrame {
 
-    GameplayPanel panel2;
 
     static final int GAME_WIDTH = 700;
     static final int GAME_HEIGHT = 600;

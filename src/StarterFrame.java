@@ -9,6 +9,8 @@ public class StarterFrame extends JFrame {
     JButton startButton;
 
     JButton exit;
+
+    JButton settings;
     public StarterFrame() {
 
         panel = new StarterPanel();
@@ -45,6 +47,18 @@ public class StarterFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 System.exit(0);
+            }
+        });
+
+        settings = new JButton("settings");
+        settings.setBounds(80,300,150,50);
+        panel.add(settings);
+
+        settings.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new SettingsFrame();
             }
         });
 

@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, MouseListener, Runnable, MouseMotionListener {
@@ -77,12 +78,14 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     boolean goUP = false;
     int numberOfBalls;
 
+    SoundTrack soundTrack = new SoundTrack();
+
     public GamePanel() {
 
         this.setFocusable(true);
         this.setPreferredSize(SCREEN_SIZE);
 
-        this.setBackground(new Color(255, 151, 215));
+        this.setBackground(new Color(255, 183, 183));
 
 
         addMouseListener(this);
@@ -112,6 +115,20 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
             }
         });
         timer3.start();
+
+        if(SettingsFrame.isSound()){
+            String path = "Hedwig_s-Theme.wav";
+            File file = new File(path);
+            File file2 = file.getAbsoluteFile();
+            soundTrack.play(String.valueOf(file2));
+        }
+
+
+
+
+
+
+
 //        if(showDialog) {
 //            timer2 = new Timer(100, new ActionListener() {
 //
@@ -196,20 +213,21 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         }
 
         //draw line
-
-        g.setColor(Color.GREEN);
-        if (disco) {
-            g.setColor(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
-        }
-        Ball ball = Ball.getBalls().getFirst();
-        if (ball.getBallYPose() >= 590) {
-            g.drawLine(ball.getBallXPos(), ball.getBallYPose(), mouseXPos2, mouseYPose2);
-        }
-        if (disco) {
-            GamePanel.this.setBackground(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
-        } else {
-            GamePanel.this.setBackground(new Color(255, 183, 183));
-        }
+if(SettingsFrame.isAiming()) {
+    g.setColor(Color.GREEN);
+    if (disco) {
+        g.setColor(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
+    }
+    Ball ball = Ball.getBalls().getFirst();
+    if (ball.getBallYPose() >= 590) {
+        g.drawLine(ball.getBallXPos(), ball.getBallYPose(), mouseXPos2, mouseYPose2);
+    }
+    if (disco) {
+        GamePanel.this.setBackground(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
+    } else {
+        GamePanel.this.setBackground(new Color(255, 183, 183));
+    }
+}
 
         //draw items
 
@@ -265,7 +283,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         if (hasPlayed() && goUP) {
 
             for (Brick brick1 : Brick.getBricks()) {
-                brick1.setY(brick1.gety() - 800);
+                brick1.setY(brick1.gety() - 300);
             }
             goUP = false;
             hasReleased = false;
@@ -357,9 +375,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
             }
 
         }
-        if (numberOfBalls > 1) {
-            Ball.getBalls().add(new Ball(Ball.getBalls().getFirst().getBallXPos() + ballXDir, Ball.getBalls().getFirst().getBallYPose() + ballYDir, ballSize, ballSize));
-        }
+//        if (numberOfBalls > 1) {
+//            Ball.getBalls().add(new Ball(Ball.getBalls().getFirst().getBallXPos() + ballXDir, Ball.getBalls().getFirst().getBallYPose() + ballYDir, ballSize, ballSize));
+//        }
         if (!stop() && !dizzy) {
             for (Ball ball : Ball.getBalls()) {
                 ball.setBallXPos(ball.getBallXPos() + ballXDir);
