@@ -46,7 +46,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     Thread thread;
 
-    private int score = numberofBricks - time / 5;
+    private int score;
 
     boolean showDialog = true;
     boolean gameOver = false;
@@ -77,8 +77,15 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     boolean goUP = false;
     int numberOfBalls;
+    private int gameTime;
+    String [] choice = {"play again","new game","first page"};
 
     SoundTrack soundTrack = new SoundTrack();
+    private static final long FRAME_TIME = 1000/60;
+    private static long timerr = System.currentTimeMillis();
+    private static int seconds = 0;
+    boolean idk = false;
+
 
     public GamePanel() {
 
@@ -122,6 +129,8 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
             File file2 = file.getAbsoluteFile();
             soundTrack.play(String.valueOf(file2));
         }
+
+
 
 
 
@@ -248,6 +257,19 @@ if(SettingsFrame.isAiming()) {
                 g.fillOval(item1.getx(), item1.gety(), itemSize, itemSize);
             }
         }
+
+        //draw time
+
+        g.setColor(Color.BLACK);
+        Font font = new Font("Algerian",Font.BOLD,30);
+        g.setFont(font);
+        g.drawString("Time: "+String.valueOf(seconds),550,580);
+
+
+        //draw score
+        g.setColor(Color.BLACK);
+        Font font1 = new Font("HelveticalNeue",Font.ITALIC,30);
+        g.drawString("Score: "+score,550,550);
 //        if(gameOver()){
 //            g.setColor(Color.red);
 //            JButton button = new JButton("Game over");
@@ -462,10 +484,17 @@ if(SettingsFrame.isAiming()) {
             double delta = 0;
 
 
+            long lastFrameTime = System.currentTimeMillis();
+
+
+
             while (true) {
                 long now = System.nanoTime();
                 delta += (now - lastTime) / ns;
                 lastTime = now;
+
+                long currentTime = System.currentTimeMillis();
+                long elapsedTime = currentTime - lastFrameTime;
                 if (delta >= 1) {
                     moveBalls();
                     checkTurn();
@@ -473,6 +502,18 @@ if(SettingsFrame.isAiming()) {
                     moveItems();
                     checkCollision();
                     hasPlayed();
+                    countScore();
+                    gameOver();
+
+
+
+                    if(elapsedTime >= FRAME_TIME){
+                        if(currentTime - timerr>= 1000){
+                            seconds++;
+                            timerr = currentTime;
+                        }
+                        lastFrameTime = currentTime;
+                    }
 
 
 
@@ -510,9 +551,26 @@ if(SettingsFrame.isAiming()) {
                         strength = false;
                     }
 
-                    System.out.println("first: " + Ball.getBalls().getFirst().getBallXPos());
-                    System.out.println("second: " + Ball.getBalls().getLast().getBallXPos());
 
+                    if(gameOver && !idk ){
+                        JOptionPane.showMessageDialog(GamePanel.this, "Game over :(\n score: " + score);
+
+                        int choice2 = JOptionPane.showOptionDialog(GamePanel.this,
+                                "choose an option",null,JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.PLAIN_MESSAGE,null,choice,choice[0]);
+                        gameOver = false;
+                        idk = true;
+                        if(choice2 == 2){
+                                   GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
+                            if (parent != null) {
+                                parent.dispose();}
+
+                            new StarterFrame();
+
+
+                        }
+
+                    }
 
 //                    if(endTurn == 1){
 //                        for(Brick brick1 : Brick.getBricks()) {
@@ -674,6 +732,20 @@ if(SettingsFrame.isAiming()) {
             }
         }
         return false;
+    }
+    public void countScore(){
+        score = numberofBricks - seconds/3;
+        if(score<0){
+            score = 0;
+        }
+    }
+    public void gameOver(){
+        for(Brick brick1 : Brick.getBricks()){
+            if(brick1.gety() >= 585){
+                gameOver = true;
+
+            }
+        }
     }
 }
 
