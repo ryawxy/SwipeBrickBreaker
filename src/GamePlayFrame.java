@@ -119,7 +119,11 @@ public class GamePlayFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new StarterFrame();
+                try {
+                    new StarterFrame();
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 

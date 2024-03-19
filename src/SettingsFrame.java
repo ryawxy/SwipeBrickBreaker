@@ -89,7 +89,11 @@ public class SettingsFrame extends JFrame {
                     aiming = true;
                 }
                 dispose();
-                new StarterFrame();
+                try {
+                    new StarterFrame();
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         back = new JButton("back");
@@ -99,7 +103,11 @@ public class SettingsFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new StarterFrame();
+                try {
+                    new StarterFrame();
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 

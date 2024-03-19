@@ -771,7 +771,11 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                                 if (parent != null) {
                                     //   parent.remove(GamePanel.this);
                                     parent.dispose();
-                                    new StarterFrame();
+                                    try {
+                                        new StarterFrame();
+                                    } catch (FileNotFoundException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                     break;
                                 }
 //
