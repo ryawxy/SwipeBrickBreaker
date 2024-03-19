@@ -12,7 +12,17 @@ public class StarterFrame extends JFrame {
 
     JButton settings;
     public StarterFrame() {
-
+        if(GamePanel.isGameOver()){
+            System.out.println("trueeeeeeeeee");
+        }else{
+            System.out.println("falseeeeeeeee");
+        }
+        Brick.getBricks().clear();
+        for (Brick brick1 : Brick.getInitialBricks()) {
+            Brick.getBricks().add(brick1);
+        }
+        Item.getItems().clear();
+        GamePanel.setGameOver(false);
         panel = new StarterPanel();
         this.add(panel);
         this.setTitle("BrickBreaker");
@@ -22,6 +32,7 @@ public class StarterFrame extends JFrame {
         this.pack();
         this.setVisible(true);
 
+
         startButton = new JButton("Start a New Game");
         startButton.setBounds(80, 100, 150, 50);
         panel.add(startButton);
@@ -29,7 +40,12 @@ public class StarterFrame extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                Brick.getBricks().clear();
+                for (Brick brick1 : Brick.getInitialBricks()) {
+                    Brick.getBricks().add(brick1);
+                }
+                Item.getItems().clear();
+                GamePanel.setGameOver(false);
                 dispose();
 
                  new GamePlayFrame();

@@ -2,23 +2,25 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 public class SettingsFrame extends JFrame {
 
-    JPanel panel = new JPanel();
+    JPanel panel;
 
     static final int GAME_WIDTH = 700;
     static final int GAME_HEIGHT = 600;
     static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH, GAME_HEIGHT);
 
-    JRadioButton aim;
+    JCheckBox aim;
     private static boolean aiming = false;
 
     JButton okButton;
 
-    JRadioButton themeSong;
+    JCheckBox themeSong;
 
-    JRadioButton save;
+    JCheckBox save;
+    JButton back;
 
     private  static boolean saving = false;
 
@@ -35,50 +37,69 @@ public class SettingsFrame extends JFrame {
 
 
 
-        aim = new JRadioButton("aiming");
+        aim = new JCheckBox("aiming");
         aim.setBounds(80,100,150,50);
         panel.add(aim);
-        aim.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                aiming = true;
-            }
-        });
+//        aim.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                aiming = true;
+//            }
+//        });
+//
 
-
-        themeSong = new JRadioButton("theme song");
+        themeSong = new JCheckBox("theme song");
         themeSong.setBounds(80,200,150,50);
         panel.add(themeSong);
-        themeSong.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+//        themeSong.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//                sound = true;
+//            }
+//        });
 
-                sound = true;
-            }
-        });
-
-        save = new JRadioButton("save");
+        save = new JCheckBox("save");
         save.setBounds(80,300,150,50);
         panel.add(save);
-        save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saving = true;
-            }
-        });
+//        save.json.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                saving = true;
+//            }
+//        });
 
 
 
 
 
         okButton = new JButton("ok");
-        okButton.setBounds(300,500,80,30);
+        okButton.setBounds(300,500,120,30);
         panel.add(okButton);
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(themeSong.isSelected()){
+                    sound = true;
+                }
+                if(save.isSelected()){
+                    saving = true;
+                }
+                if(aim.isSelected()){
+                    aiming = true;
+                }
                 dispose();
-             new StarterFrame();
+                new StarterFrame();
+            }
+        });
+        back = new JButton("back");
+        back.setBounds(10,10,80,40);
+        panel.add(back);
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new StarterFrame();
             }
         });
 
@@ -89,7 +110,7 @@ public class SettingsFrame extends JFrame {
         this.setContentPane(panel);
         this.setResizable(false);
         this.setVisible(true);
-
+        this.setIconImage(new ImageIcon("logo.png").getImage());
 
     }
 
@@ -103,5 +124,17 @@ public class SettingsFrame extends JFrame {
 
     public static boolean isSaving() {
         return saving;
+    }
+
+    public static void setSaving(boolean saving) {
+        SettingsFrame.saving = saving;
+    }
+
+    public static void setSound(boolean sound) {
+        SettingsFrame.sound = sound;
+    }
+
+    public static void setAiming(boolean aiming) {
+        SettingsFrame.aiming = aiming;
     }
 }

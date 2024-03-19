@@ -1,8 +1,13 @@
-public class Main {
-    public static void main(String[] args) {
+import java.io.FileNotFoundException;
 
-        Brick.setInitialBricks();
+public class Main {
+
+    public static void main(String[] args) throws FileNotFoundException {
+
+
+        //  Brick.setInitialBricks();
         Ball.setInitialBalls();
         new StarterFrame();
+
     }
 }

@@ -1,8 +1,15 @@
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.util.Random;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.logging.Handler;
+
+
 
 public class GamePanel extends JPanel implements ActionListener, MouseListener, Runnable, MouseMotionListener {
 
@@ -12,6 +19,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     private int brickXPos;
     private int brickYPos;
+
 
     private int mouseXPos;
     private int mouseYPose;
@@ -34,9 +42,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     Graphics graphics;
 
-    private final int ballSize = 10;
+    private final int ballSize = 12;
 
-    Brick brick = new Brick(0, 0, 0, 0, 0, 0);
+    Brick brick = new Brick(0, 0, 0, 0, 0, 0,0);
 
     Timer timer;
 
@@ -49,7 +57,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     private int score;
 
     boolean showDialog = true;
-    boolean gameOver = false;
+    private static boolean gameOver = false;
 
     int INITIAL_XPOSITION = 150;
     int INITIAL_YPOSITION = 590;
@@ -84,16 +92,44 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     private static final long FRAME_TIME = 1000/60;
     private static long timerr = System.currentTimeMillis();
     private static int seconds = 0;
-    boolean idk = false;
+    private static boolean idk = false;
+    boolean pause = false;
+    JButton pauseGame;
+    boolean gameStarted = false;
+    boolean bomb = false;
+    SoundTrack explosion;
+    boolean explode = false;
+    int x;
+    int y;
+    ArrayList<Brick> explodedBricks = new ArrayList<>();
+    boolean extraLive = false;
+    boolean used = false;
+    boolean hasDragged = false;
+    Timer timer10;
+    boolean addBall = false;
+    int x2;
+    int y2;
+    ArrayList<String> playerName = new ArrayList<>();
+
+
 
 
     public GamePanel() {
 
+
+        gameStarted = false;
+        gameOver = false;
+        //   setNewGame();
         this.setFocusable(true);
         this.setPreferredSize(SCREEN_SIZE);
 
         this.setBackground(new Color(255, 183, 183));
+        Brick brick1 = new Brick(0,-100,60,40,2,0,2);
+        Brick brick2 = new Brick(300,-100,60,40,2,3,2);
+        Brick.getBricks().add(brick1);
+        Brick.getBricks().add(brick2);
 
+        //    Ball.getBalls().add(new Ball(150,590,10,10));
 
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -104,9 +140,11 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         timer = new Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                time++;
-                brick.addBrick();
-                repaint();
+                if (!pause && !gameOver) {
+                    time++;
+                    brick.addBrick();
+                    repaint();
+                }
             }
         });
         timer.start();
@@ -115,28 +153,50 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         timer3 = new Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!turn) {
-                    item.addItem();
+                if (!turn && !pause && !gameOver) {
+                    int feature = rand.nextInt(7);
+
+                    int x = rand.nextInt(300);
+                    int y = rand.nextInt(300);
+
+                    if(feature == 6) {
+                        if (!used) {
+                            Item.getItems().add(new Item(x, y, 10, 10, feature));
+                            used = true;
+                        }
+                    }else{
+                        Item.getItems().add(new Item(x, y, 10, 10, feature));
+                    }
                     repaint();
                 }
             }
         });
         timer3.start();
 
-        if(SettingsFrame.isSound()){
-            String path = "Hedwig_s-Theme.wav";
-            File file = new File(path);
-            File file2 = file.getAbsoluteFile();
-            soundTrack.play(String.valueOf(file2));
-        }
+//        if(SettingsFrame.isSound()){
+//            String path = "Hedwig_s-Theme.wav";
+//            File file = new File(path);
+//            File file2 = file.getAbsoluteFile();
+//            if(!gameOver) {
+//                soundTrack.play(String.valueOf(file2));
+//            }
+//        }
+        pauseGame = new JButton("Pause");
+        pauseGame.setBounds(560,500,50,50);
+        this.add(pauseGame);
+        pauseGame.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(pauseGame.getText().equals("Pause")){
+                    pause = true;
+                    pauseGame.setText("Resume");
+                }else if(pauseGame.getText().equals("Resume")){
+                    pause = false;
+                    pauseGame.setText("Pause");
+                }
 
-
-
-
-
-
-
-
+            }
+        });
 
 //        if(showDialog) {
 //            timer2 = new Timer(100, new ActionListener() {
@@ -189,6 +249,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                 if (brick.getFeature() == 2) {
                     g.setColor(Color.yellow);
                 }
+                if (brick.getFeature() == 3) {
+                    g.setColor(Color.WHITE);
+                }
                 if (disco) {
                     g.setColor(new Color(rand.nextInt(100), rand.nextInt(100), rand.nextInt(100)));
                 }
@@ -209,50 +272,61 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
             case "Red" -> Color.RED;
             case "Blue" -> Color.BLUE;
             case "Cyan" -> Color.CYAN;
-            default -> null;
+            default -> Color.RED;
         };
 
         if (disco) {
             color1 = new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150));
         }
-        for (Ball ball : Ball.getBalls()) {
+
+        for (int i = 0; i < Ball.getBalls().size(); i++) {
+            Ball ball = Ball.getBalls().get(i);
             g.setColor(color1);
             g.fillOval(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
             hasMoved = true;
         }
 
+
         //draw line
-if(SettingsFrame.isAiming()) {
-    g.setColor(Color.GREEN);
-    if (disco) {
-        g.setColor(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
-    }
-    Ball ball = Ball.getBalls().getFirst();
-    if (ball.getBallYPose() >= 590) {
-        g.drawLine(ball.getBallXPos(), ball.getBallYPose(), mouseXPos2, mouseYPose2);
-    }
-    if (disco) {
-        GamePanel.this.setBackground(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
-    } else {
-        GamePanel.this.setBackground(new Color(255, 183, 183));
-    }
-}
+        if(SettingsFrame.isAiming()) {
+            g.setColor(Color.GREEN);
+            if (disco) {
+                g.setColor(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
+            }
+            Ball ball = Ball.getBalls().getFirst();
+            if (ball.getBallYPose() >= 580) {
+                g.drawLine(ball.getBallXPos(), ball.getBallYPose(), mouseXPos2, mouseYPose2);
+            }
+            if (disco) {
+                GamePanel.this.setBackground(new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
+            } else {
+                GamePanel.this.setBackground(new Color(255, 183, 183));
+            }
+        }
 
         //draw items
 
         for (Item item1 : Item.getItems()) {
-            if (item1.getFeature() <= 5 && item1.getFeature() > 0) {
-                if (item1.getFeature() == 1) {
-                    g.setColor(new Color(160, 32, 200));
-                } else if (item1.getFeature() == 2) {
-                    g.setColor(new Color(255, 151, 215));
-                } else if (item1.getFeature() == 3) {
-                    g.setColor(new Color(175, 193, 255));
+            if (item1.getFeature() <= 6 && item1.getFeature() > 0) {
+                if (disco) {
+                    color1 = new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150));
+                    g.setColor(color1);
+                }else {
+                    if (item1.getFeature() == 1) {
+                        g.setColor(new Color(160, 32, 200));
+                    } else if (item1.getFeature() == 2) {
+                        g.setColor(new Color(255, 151, 215));
+                    } else if (item1.getFeature() == 3) {
+                        g.setColor(new Color(175, 193, 255));
 
-                } else if (item1.getFeature() == 4) {
-                    g.setColor(new Color(255, 165, 51));
-                } else if (item1.getFeature() == 5) {
-                    g.setColor(Color.BLACK);
+                    } else if (item1.getFeature() == 4) {
+                        g.setColor(new Color(255, 165, 51));
+                    } else if (item1.getFeature() == 5) {
+                        g.setColor(Color.BLACK);
+                    } else if (item1.getFeature() == 6 && !used) {
+                        g.setColor(new Color(100, 50, 50));
+
+                    }
                 }
                 g.fillOval(item1.getx(), item1.gety(), itemSize, itemSize);
             }
@@ -270,6 +344,31 @@ if(SettingsFrame.isAiming()) {
         g.setColor(Color.BLACK);
         Font font1 = new Font("HelveticalNeue",Font.ITALIC,30);
         g.drawString("Score: "+score,550,550);
+
+        Toolkit.getDefaultToolkit().sync();
+        //draw explosion
+//        if(explode){
+//          for(Brick brick1 : explodedBricks){
+//              for(int i=0;i<10;i++){
+//                  for(int j=0;j<20;j++){
+//                      int number = brick1.getInitialnum();
+//                      if(number == 1 ){
+//                          g.setColor(new Color(0,255,0,20-j));
+//                      }
+//                      if(number == 2 ){
+//                          g.setColor(new Color(0,255,25,20-j));
+//                      } if(number == 3 ){
+//                          g.setColor(new Color(0,0,0,20-j));
+//                      }else{
+//                          g.setColor(new Color(255,0,0,20-j));
+//                      }
+//                      g.fillRect(brick.getx()+i,brick.gety()+i,3,3);
+//
+//                  }
+//              }
+//          }
+//          explode = false;
+//        }
 //        if(gameOver()){
 //            g.setColor(Color.red);
 //            JButton button = new JButton("Game over");
@@ -294,41 +393,43 @@ if(SettingsFrame.isAiming()) {
     }
 
     public void moveBricks() {
+        if (!pause) {
+            if (hasPlayed() && !goUP) {
 
-        if (hasPlayed() && !goUP) {
+                for (Brick brick1 : Brick.getBricks()) {
+                    brick1.setY(brick1.gety() + 60);
+                    hasReleased = false;
+                    hasDragged = false;
+                }
+            }
+            if (hasPlayed() && goUP) {
 
-            for (Brick brick1 : Brick.getBricks()) {
-                brick1.setY(brick1.gety() + 60);
+                for (Brick brick1 : Brick.getBricks()) {
+                    brick1.setY(brick1.gety() - 300);
+                }
+                goUP = false;
                 hasReleased = false;
+                hasDragged = false;
             }
-        }
-        if (hasPlayed() && goUP) {
-
-            for (Brick brick1 : Brick.getBricks()) {
-                brick1.setY(brick1.gety() - 300);
-            }
-            goUP = false;
-            hasReleased = false;
-        }
-        if (!turn && !hasPlayed()) {
-            if(GamePlayFrame.getChosenLevel().equals("easy")){
-            for (Brick brick : Brick.getBricks()) {
-                brick.setY(brick.gety() + 1);
-            }
-            }else if(GamePlayFrame.getChosenLevel().equals("medium")){
-                for (Brick brick : Brick.getBricks()) {
-                    brick.setY(brick.gety() + 2);
+            if (!turn && !hasPlayed()) {
+                if (GamePlayFrame.getChosenLevel().equals("easy")) {
+                    for (Brick brick : Brick.getBricks()) {
+                        brick.setY(brick.gety() + 1);
+                    }
+                } else if (GamePlayFrame.getChosenLevel().equals("medium")) {
+                    for (Brick brick : Brick.getBricks()) {
+                        brick.setY(brick.gety() + 2);
+                    }
+                } else if (GamePlayFrame.getChosenLevel().equals("hard")) {
+                    for (Brick brick : Brick.getBricks()) {
+                        brick.setY(brick.gety() + 3);
+                    }
                 }
-                }
-            else if(GamePlayFrame.getChosenLevel().equals("hard")){
-                for (Brick brick : Brick.getBricks()) {
-                    brick.setY(brick.gety() + 3);
-                }
-            }
             }
 
 
         }
+    }
 
 
     public void changeSize() {
@@ -351,81 +452,93 @@ if(SettingsFrame.isAiming()) {
         }
     }
 
-    public void moveBalls() {
+    public void moveBalls() throws InterruptedException {
 
-//        int x = 0;
-//        int y = 0;
-//        if(numberOfBalls>1 && hasPlayed()){
-//            for(Ball ball : Ball.getBalls()){
-//                if(ball.getBallYPose()>= 590){
-//                    x = ball.getBallXPos();
-//                    y = ball.getBallYPose();
-//                    break;
-//                }
-//                break;
-//            }
-//            for(Ball ball : Ball.getBalls()){
-//                ball.setBallXPos(x);
-//                ball.setBallYPose(y);
-//            }
-//        }
+        for (Ball ball : Ball.getBalls()) {
 
-        Ball ball2 = Ball.getBalls().getFirst();
+            //   Ball ball2 = Ball.getBalls().getFirst();
+            if (!pause) {
+                if (mouseYPose - mouseYPose2 != 0 || mouseXPos - mouseXPos2 != 0) {
+                    if (!speed && !dizzy) {
+                        ballXDir = (mouseXPos2 - ball.getBallXPos()) / 12;
+                        ballYDir = (mouseYPose2 - ball.getBallYPose()) / 12;
+                        if (dizzy) {
+//                        System.out.println("dizzy here");
+//                        System.out.println(mouseXPos2);
+                        }
+                    }
+                    if (speed && !dizzy) {
+                        ballXDir = (mouseXPos2 - ball.getBallXPos()) / 5;
+                        ballYDir = (mouseYPose2 - ball.getBallYPose()) / 5;
+                    }
+                    if (dizzy) {
 
-        if (mouseYPose - mouseYPose2 != 0 || mouseXPos - mouseXPos2 != 0) {
-            if (!speed && !dizzy) {
-                ballXDir = (mouseXPos2 - ball2.getBallXPos()) / 8;
-                ballYDir = (mouseYPose2 - ball2.getBallYPose()) / 8;
-            }
-            if (speed && !dizzy) {
-                ballXDir = (mouseXPos2 - ball2.getBallXPos()) / 5;
-                ballYDir = (mouseYPose2 - ball2.getBallYPose()) / 5;
-            }
-            if (dizzy) {
+                        ballXDir = -1 * (mouseXPos2 - ball.getBallXPos()) / 8;
+                        ballYDir = (mouseYPose2 - ball.getBallYPose()) / 8;
 
-//                int x = rand.nextInt(50);
-//                int y = rand.nextInt(50);
-//                ballXDir =  (x -ball2.getBallXPos() )/8;
-//                ballYDir =  (y - ball2.getBallYPose())/8;
-                ballXDir = -1 * (mouseXPos2 - ball2.getBallXPos()) / 8;
-                ballYDir = (mouseYPose2 - ball2.getBallYPose()) / 8;
 
-                for (Ball ball : Ball.getBalls()) {
+                    }
+
+
+                }
+
+                checkCollision();
+                Thread.sleep(1);
+
+                if (!stop()) {
+                    checkCollision();
                     ball.setBallXPos(ball.getBallXPos() + ballXDir);
                     ball.setBallYPose(ball.getBallYPose() + ballYDir);
+                    //  checkCollision();
+
                 }
+
             }
+
+            Thread.sleep(1);
 
         }
-//        if (numberOfBalls > 1) {
-//            Ball.getBalls().add(new Ball(Ball.getBalls().getFirst().getBallXPos() + ballXDir, Ball.getBalls().getFirst().getBallYPose() + ballYDir, ballSize, ballSize));
-//        }
-        if (!stop() && !dizzy) {
-            for (Ball ball : Ball.getBalls()) {
-                ball.setBallXPos(ball.getBallXPos() + ballXDir);
-                ball.setBallYPose(ball.getBallYPose() + ballYDir);
-
-            }
-        }
-        for (Ball ball : Ball.getBalls()) {
-            if (ball.getBallXPos() <= 0 || ball.getBallXPos() >= GAME_WIDTH - ballSize) {
-                ballXDir = -1 * ballXDir;
-            }
-            if (ball.getBallYPose() <= 0) {
-                ballYDir = -1 * ballYDir;
-            }
-            dizzy = false;
-
-        }
-
     }
+
+//    public void shootBall(Ball ball) {
+//
+//        if (!pause) {
+//            if (mouseYPose - mouseYPose2 != 0 || mouseXPos - mouseXPos2 != 0) {
+//                if (!speed && !dizzy) {
+//                    ballXDir = (mouseXPos2 - ball.getBallXPos()) / 12;
+//                    ballYDir = (mouseYPose2 - ball.getBallYPose()) / 12;
+//
+//                }
+//                if (speed && !dizzy) {
+//                    ballXDir = (mouseXPos2 - ball.getBallXPos()) / 5;
+//                    ballYDir = (mouseYPose2 - ball.getBallYPose()) / 5;
+//                }
+//                if (dizzy) {
+//
+//                    ballXDir = -1 * (mouseXPos2 - ball.getBallXPos()) / 8;
+//                    ballYDir = (mouseYPose2 - ball.getBallYPose()) / 8;
+//
+//                }
+//
+//            }
+//
+//            if (!stop()) {
+//
+//                ball.setBallXPos(ball.getBallXPos() + ballXDir);
+//                ball.setBallYPose(ball.getBallYPose() + ballYDir);
+//
+//
+//            }
+//
+//        }
+//    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         moveBricks();
-        moveBalls();
-        checkCollision();
+        //  moveBalls();
+        // checkCollision();
         repaint();
     }
 
@@ -440,7 +553,7 @@ if(SettingsFrame.isAiming()) {
     @Override
     public void mouseReleased(MouseEvent e) {
 
-        if (!turn) {
+        if (!turn && !pause) {
             mouseXPos = e.getX();
             mouseYPose = e.getY();
 
@@ -448,6 +561,9 @@ if(SettingsFrame.isAiming()) {
             for (Ball ball : Ball.getBalls()) {
                 ball.setBallXPos(mouseXPos);
                 ball.setBallYPose(mouseYPose);
+            }
+            if(dizzy){
+                dizzy = false;
             }
 
             repaint();
@@ -476,15 +592,27 @@ if(SettingsFrame.isAiming()) {
 
     @Override
     public void run() {
-        if (!gameOver) {
+
+
+        //     setNewGame();
+        if (!gameOver && !pause) {
             //game loop
             long lastTime = System.nanoTime();
             double amountOfTicks = 60.0;
-            double ns = 2000000000 / amountOfTicks;
+            double ns = 1000000000 / amountOfTicks;
             double delta = 0;
 
 
             long lastFrameTime = System.currentTimeMillis();
+
+            if(SettingsFrame.isSound()){
+                String path = "Hedwig_s-Theme.wav";
+                File file = new File(path);
+                File file2 = file.getAbsoluteFile();
+                if(!gameOver) {
+                    soundTrack.play(String.valueOf(file2));
+                }
+            }
 
 
 
@@ -496,107 +624,216 @@ if(SettingsFrame.isAiming()) {
                 long currentTime = System.currentTimeMillis();
                 long elapsedTime = currentTime - lastFrameTime;
                 if (delta >= 1) {
-                    moveBalls();
-                    checkTurn();
-                    moveBricks();
-                    moveItems();
-                    checkCollision();
-                    hasPlayed();
-                    countScore();
-                    gameOver();
+                    if (!pause && !gameOver ) {
 
-
-
-                    if(elapsedTime >= FRAME_TIME){
-                        if(currentTime - timerr>= 1000){
-                            seconds++;
-                            timerr = currentTime;
+                        checkTurn();
+                        moveBricks();
+                        moveItems();
+                        try {
+                            checkCollision();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
-                        lastFrameTime = currentTime;
-                    }
+                        try {
 
+                            moveBalls();
 
-
-                    if (earthquake) {
-                        changeSize();
-                        timeLeft++;
-                    }
-                    if (timeLeft >= 400) {
-                        earthquake = false;
-
-                        timeLeft = 0;
-                    }
-
-                    if (disco) {
-                        invisible();
-                        timeLeft2++;
-                    }
-                    if (timeLeft2 >= 400) {
-                        disco = false;
-                        timeLeft2 = 0;
-                    }
-
-                    if (speed) {
-                        timeLeft4++;
-                    }
-                    if (timeLeft4 >= 500) {
-                        speed = false;
-                        timeLeft4 = 0;
-                    }
-                    if (strength) {
-                        timeLeft5++;
-                    }
-                    if (timeLeft5 >= 500) {
-                        timeLeft5 = 0;
-                        strength = false;
-                    }
-
-
-                    if(gameOver && !idk ){
-                        JOptionPane.showMessageDialog(GamePanel.this, "Game over :(\n score: " + score);
-
-                        int choice2 = JOptionPane.showOptionDialog(GamePanel.this,
-                                "choose an option",null,JOptionPane.DEFAULT_OPTION,
-                                JOptionPane.PLAIN_MESSAGE,null,choice,choice[0]);
-                        gameOver = false;
-                        idk = true;
-                        if(choice2 == 2){
-                                   GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
-                            if (parent != null) {
-                                parent.dispose();}
-
-                            new StarterFrame();
-
-
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
 
-                    }
+                        countScore();
+                        hasPlayed();
+                        firstOnGround();
+                        getTogether();
 
-//                    if(endTurn == 1){
-//                        for(Brick brick1 : Brick.getBricks()) {
-//                            brick1.setY(brick1.gety()+10);
-//                        }
-//                        endTurn = 0;
-//                    }
-                    repaint();
-                    delta--;
+                        gameOver();
+
+
+
+                        System.out.println(Ball.getBalls().size());
+
+
+
+                        if (elapsedTime >= FRAME_TIME) {
+                            if (currentTime - timerr >= 1000) {
+                                seconds++;
+                                timerr = currentTime;
+                            }
+                            lastFrameTime = currentTime;
+                        }
+
+
+                        if (earthquake) {
+                            changeSize();
+                            timeLeft++;
+                        }
+                        if (timeLeft >= 400) {
+                            earthquake = false;
+
+                            timeLeft = 0;
+                        }
+
+                        if (disco) {
+                            invisible();
+                            timeLeft2++;
+                        }
+                        if (timeLeft2 >= 400) {
+                            disco = false;
+                            timeLeft2 = 0;
+                        }
+
+                        if (speed) {
+                            timeLeft4++;
+                        }
+                        if (timeLeft4 >= 500) {
+                            speed = false;
+                            timeLeft4 = 0;
+                        }
+                        if (strength) {
+                            timeLeft5++;
+                        }
+                        if (timeLeft5 >= 500) {
+                            timeLeft5 = 0;
+                            strength = false;
+                        }
+
+
+
+                        if (gameOver) {
+
+
+                            FileWriter fw = null;
+                            try {
+                                fw = new FileWriter("highestScore.txt", true);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            BufferedWriter bw = new BufferedWriter(fw);
+                            try {
+                                bw.write(score+"/");
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+//
+                            try {
+                                bw.close();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+
+                            if(SettingsFrame.isSaving()) {
+                                FileWriter fw1 = null;
+                                try {
+                                    fw1 = new FileWriter("data.txt", true);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                BufferedWriter bw1 = new BufferedWriter(fw1);
+                                try {
+                                    bw1.write(GamePlayFrame.getPlayerName() + "/" + score + "/" + LocalDate.now() + "/" + LocalTime.now());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                try {
+                                    bw1.newLine();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                                try {
+                                    bw1.close();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+
+
+                            JOptionPane.showMessageDialog(GamePanel.this, "Game over :(\n score: " + score);
+                            //    gameOver = false;
+                            int choice2 = JOptionPane.showOptionDialog(GamePanel.this,
+                                    "choose an option", null, JOptionPane.DEFAULT_OPTION,
+                                    JOptionPane.PLAIN_MESSAGE, null, choice, choice[0]);
+                            setNewGame();
+                            repaint();
+                            gameOver = false;
+
+
+                            if (choice2 == 2) {
+                                SettingsFrame.setAiming(false);
+                                SettingsFrame.setSaving(false);
+                                SettingsFrame.setSound(false);
+
+                                // repaint();
+                                GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
+                                if (parent != null) {
+                                    //   parent.remove(GamePanel.this);
+                                    parent.dispose();
+                                    new StarterFrame();
+                                    break;
+                                }
+//
+//                                seconds = 0;
+//                                score = 0;
+
+                                //               new StarterFrame();
+                                //    break;
+
+
+                            }
+                            if(choice2 == 1) {
+                                GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
+                                if (parent != null) {
+                                    parent.remove(GamePanel.this);
+                                    parent.dispose();
+                                    new GamePlayFrame();
+                                    break;
+                                }
+                            }
+                            if(choice2 == 0){
+                                GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
+                                if (parent != null) {
+                                    parent.remove(GamePanel.this);
+                                    parent.dispose();
+                                    new GameFrame();
+                                    break;
+                                }
+
+                            }
+
+
+                            break;
+
+                        }
+
+                        repaint();
+                        delta--;
+                    }
 
                 }
             }
         }
     }
 
+
     public boolean stop() {
+        boolean allOnGround = true;
         for (Ball ball : Ball.getBalls()) {
-            return ball.getBallYPose() >= GAME_HEIGHT - ballSize;
+            if (ball.getBallYPose() < 580) {
+                allOnGround = false;
+                break;
+            }
         }
-        return false;
+        return allOnGround;
     }
 
-    public void checkCollision() {
+    public void checkCollision() throws InterruptedException {
 
         for (Ball ball : Ball.getBalls()) {
-            for (Brick brick : Brick.getBricks()) {
+            for (int i = 0; i < Brick.getBricks().size(); i++){
+                Brick brick = Brick.getBricks().get(i);
 
                 if (brick.getNumber() > 0) {
                     Rectangle rect = new Rectangle(brick.getx(), brick.gety(), 60, 40);
@@ -608,7 +845,7 @@ if(SettingsFrame.isAiming()) {
                         ballYDir = -1 * ballYDir;
 
                         if (brick.getNumber() == 1) {
-                            numberofBricks++;
+                            numberofBricks += brick.getInitialnum();
                             if (brick.getFeature() == 1) {
                                 earthquake = true;
 
@@ -617,11 +854,57 @@ if(SettingsFrame.isAiming()) {
                             if (brick.getFeature() == 2) {
                                 disco = true;
                             }
+                            if (brick.getFeature() == 3) {
+                                bomb = true;
+                                explode = true;
+                            }
                         }
-                        if (!strength) {
+                        if (brick.getNumber() <= 0) {
+                            if (brick.getFeature() == 1) {
+                                earthquake = true;
+
+
+                            }
+                            if (brick.getFeature() == 2) {
+                                disco = true;
+                            }
+                            if (brick.getFeature() == 3) {
+                                bomb = true;
+                                explode = true;
+                            }
+                        }
+                        if (!strength && !bomb) {
                             brick.setNumber(brick.getNumber() - 1);
-                        } else {
+                        } else if (strength && !bomb) {
                             brick.setNumber(brick.getNumber() - 2);
+
+
+                        } else if (!strength && bomb) {
+                            x = brick.getx();
+                            y = brick.gety();
+                            if (brick.getNumber() == 1) {
+                                explodedBricks.add(brick);
+                                brick.setNumber(brick.getNumber() - 50);
+                                for (int j = 0; j < Brick.getBricks().size(); j++) {
+                                    Brick brick1 = Brick.getBricks().get(j);
+
+                                    if ((brick1.getx() >= x - 50 || brick1.getx() <= x + 50) &&
+                                            brick1.gety() >= y - 50 || brick1.gety() <= y + 50) {
+                                        explodedBricks.add(brick1);
+                                        numberofBricks += brick1.getInitialnum();
+                                        brick1.setNumber(brick1.getNumber() - 50);
+                                        SoundTrack player = new SoundTrack();
+                                        String path = "explosion.wav";
+                                        File file = new File(path);
+                                        File file2 = file.getAbsoluteFile();
+                                        soundTrack.play(String.valueOf(file2));
+                                        bomb = false;
+                                        soundTrack.pause();
+                                    }
+                                }
+
+                                numberofBricks = numberofBricks - 1;
+                            }
                         }
 
                         repaint();
@@ -630,15 +913,32 @@ if(SettingsFrame.isAiming()) {
                 }
             }
         }
+
+
+        for (Ball ball : Ball.getBalls()) {
+            if (ball.getBallXPos() <= 2 || ball.getBallXPos() >= GAME_WIDTH - ballSize) {
+                ballXDir = -1 * ballXDir;
+            }
+            if (ball.getBallYPose() <= 3) {
+                ballYDir = -1 * ballYDir;
+            }
+
+        }
         for (Ball ball : Ball.getBalls()) {
             for (Item item1 : Item.getItems()) {
-                if (item1.getFeature() <= 5 && item1.getFeature() > 0) {
+                if (item1.getFeature() <= 6 && item1.getFeature() > 0) {
                     Rectangle rect = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
                     Rectangle rect2 = new Rectangle(item1.getx(), item1.gety(), itemSize, itemSize);
 
                     if (rect.intersects(rect2)) {
                         ballXDir = -1 * ballXDir;
                         ballYDir = -1 * ballYDir;
+
+                        if(item1.getFeature() == 1){
+                            addBall = true;
+                            item1.setFeature(10);
+                        }
+
                         if (item1.getFeature() == 2) {
                             speed = true;
                             item1.setFeature(10);
@@ -655,6 +955,9 @@ if(SettingsFrame.isAiming()) {
                         if (item1.getFeature() == 5) {
                             goUP = true;
                             item1.setFeature(10);
+                        }  if (item1.getFeature() == 6) {
+                            extraLive = true;
+                            item1.setFeature(10);
                         }
                     }
                     repaint();
@@ -666,13 +969,15 @@ if(SettingsFrame.isAiming()) {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (!turn) {
+        if (!turn && !pause) {
 
             mouseXPos2 = e.getX();
             mouseYPose2 = e.getY();
 
+            hasDragged = true;
 
         }
+
 
     }
 
@@ -680,22 +985,6 @@ if(SettingsFrame.isAiming()) {
     public void mouseMoved(MouseEvent e) {
     }
 
-    public void changePosition() {
-        for (Ball ball : Ball.getBalls()) {
-            //        if(hasMoved()){
-            if (ball.getBallYPose() >= 590 && ball.getBallXPos() != 150) {
-                INITIAL_XPOSITION = ball.getBallXPos();
-                INITIAL_YPOSITION = ball.getBallYPose();
-                break;
-            }
-        }
-        //   }
-        for (Ball ball : Ball.getBalls()) {
-            ball.setBallXPos(INITIAL_XPOSITION);
-            ball.setBallYPose(INITIAL_YPOSITION);
-        }
-        Ball.getBalls().add(new Ball(INITIAL_XPOSITION, INITIAL_YPOSITION, ballSize, ballSize));
-    }
 
     //   public boolean hasMoved(){
 //        for(Ball ball : Ball.getBalls()){
@@ -709,44 +998,152 @@ if(SettingsFrame.isAiming()) {
 
     public void checkTurn() {
         for (Ball ball : Ball.getBalls()) {
-            if (ball.getBallYPose() < 590) {
+            if (ball.getBallYPose() < 580) {
                 turn = true;
                 endTurn = 0;
             } else {
                 turn = false;
 
             }
-            if (ball.getBallYPose() >= 570) {
+            if (ball.getBallYPose() >= 580) {
                 endTurn = 1;
             }
         }
     }
 
     public boolean hasPlayed() {
+        boolean b = true;
+        for (int i = 0; i < Ball.getBalls().size(); i++){
+            Ball ball = Ball.getBalls().get(i);
+            if (ball.getBallYPose() >= 580 && hasReleased && hasDragged && b) {
 
-        for (Ball ball : Ball.getBalls()) {
-            if (ball.getBallYPose() >= 585 && hasReleased) {
-                numberOfBalls++;
+                x = ball.getBallXPos();
+                y = ball.getBallYPose();
+                if (!addBall) {
+                    Ball.getBalls().add(new Ball(x, y, 10, 10));
 
+
+
+
+                } else {
+                    Ball.getBalls().add(new Ball(x, y, 10, 10));
+                    Ball.getBalls().add(new Ball(x, y, 10, 10));
+                    addBall = false;
+
+
+                }
+
+                //   numberOfBalls++;
+                Ball.getBalls().removeLast();
+                Ball.getBalls().add(new Ball(x, y, 10, 10));
                 return true;
+
+
             }
         }
+
         return false;
     }
+
+
+
     public void countScore(){
-        score = numberofBricks - seconds/3;
+        score = numberofBricks-seconds/4;
         if(score<0){
             score = 0;
         }
     }
     public void gameOver(){
-        for(Brick brick1 : Brick.getBricks()){
-            if(brick1.gety() >= 585){
-                gameOver = true;
+        for(Brick brick1 : Brick.getBricks()) {
+            if (brick1.getNumber() > 0) {
+                if (brick1.gety() >= 570) {
+                    if (!extraLive) {
+                        gameOver = true;
+                    }
+                }
+            }
 
+        }if(extraLive ){
+            ArrayList<Brick> bricks = new ArrayList<>();
+            for(Brick brick11 : Brick.getBricks()) {
+                if (brick11.getNumber() > 0) {
+                    if (brick11.gety() >= 570) {
+                        bricks.add(brick11);
+                    }
+                }
+            }
+            if(bricks.size() >= 2){
+                gameOver = true;
+                extraLive = false;
+            }
+        }
+
+
+    }
+
+
+    public static boolean isGameOver() {
+        return gameOver;
+    }
+
+    public static void setGameOver(boolean gameOver) {
+        GamePanel.gameOver = gameOver;
+    }
+    public void setNewGame() {
+        if (gameOver) {
+
+            Brick.getBricks().clear();
+//            for (Brick brick1 : Brick.getInitialBricks()) {
+//                Brick.getBricks().add(brick1);
+//            }
+            Item.getItems().clear();
+            Ball.getBalls().clear();
+            Ball.getBalls().add(new Ball(150,590,10,10));
+            gameOver = false;
+            seconds = 0;
+            score = 0;
+        }
+    }
+//    public void addBalls(){
+//        if(hasPlayed()){
+//
+//            for(Ball ball : Ball.getBalls()){
+//                if(ball.getBallYPose()>=580){
+//                    x = ball.getBallXPos();
+//                    y = ball.getBallYPose();
+//                }
+//            }
+//        }
+//        Ball.getBalls().add(new Ball(x,y,10,10));;
+//    }
+
+
+    public void getTogether() {
+        boolean allOnGround = true;
+        for (Ball ball : Ball.getBalls()) {
+            if (ball.getBallYPose() < 580) {
+                allOnGround = false;
+                break;
+            }
+        }
+        if(allOnGround){
+            for(Ball ball1: Ball.getBalls()){
+                ball1.setBallYPose(y2);
+                ball1.setBallXPos(x2);
             }
         }
     }
+
+    public void firstOnGround(){
+        for(Ball ball : Ball.getBalls()){
+            if(ball.getBallYPose()>=580){
+                x2 = ball.getBallXPos();
+                y2 = ball.getBallYPose();
+            }
+        }
+    }
+
+
 }
 
 

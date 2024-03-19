@@ -8,6 +8,13 @@ public class StarterPanel extends JPanel {
     static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH, GAME_HEIGHT);
     public StarterPanel(){
 
+        Brick.getBricks().clear();
+        for (Brick brick1 : Brick.getInitialBricks()) {
+            Brick.getBricks().add(brick1);
+        }
+        GamePanel.setGameOver(false);
+        Item.getItems().clear();
+
         this.setFocusable(true);
         this.setPreferredSize(SCREEN_SIZE);
         this.setBackground(Color.pink);

@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 public class GamePlayFrame extends JFrame {
 
@@ -10,23 +11,32 @@ public class GamePlayFrame extends JFrame {
     static final int GAME_HEIGHT = 600;
     static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH, GAME_HEIGHT);
 
-   JButton startButton ;
+    JButton startButton ;
 
-   JPanel panel = new JPanel();
+    JPanel panel = new JPanel();
 
-   JTextField enterName;
+    JTextField enterName;
 
-   JLabel name;
-   JLabel color;
+    JLabel name;
+    JLabel color;
 
-   JButton start;
+    JButton start;
 
-   JLabel level;
-   private static String chosenLevel;
-  private static  String chosenColor;
-  JComboBox<String> levelSelection;
-  JComboBox<String> colorSelection ;
+    JLabel level;
+    JButton back;
+    private static String chosenLevel;
+    private static  String chosenColor;
+    JComboBox<String> levelSelection;
+    JComboBox<String> colorSelection ;
+    private static String playerName;
     public GamePlayFrame(){
+
+        Brick.getBricks().clear();
+        for (Brick brick1 : Brick.getInitialBricks()) {
+            Brick.getBricks().add(brick1);
+        }
+        Item.getItems().clear();
+        GamePanel.setGameOver(false);
 
         super.setTitle("Brick Breaker");
         this.setSize(750,650);
@@ -41,6 +51,12 @@ public class GamePlayFrame extends JFrame {
         enterName = new JTextField();
         enterName.setBounds(100,220,80,30);
         panel.add(enterName);
+        enterName.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playerName = enterName.getSelectedText();
+            }
+        });
 
 
         color = new JLabel("Choose a color.");
@@ -89,17 +105,30 @@ public class GamePlayFrame extends JFrame {
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                playerName = enterName.getText();
+
                 dispose();
                 new GameFrame();
             }
         });
 
+        back = new JButton("back");
+        back.setBounds(10,10,80,40);
+        panel.add(back);
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new StarterFrame();
+            }
+        });
 
+        this.setIconImage(new ImageIcon("logo.png").getImage());
 
 
 
         panel.setLayout(null);
-      //  this.setLocationRelativeTo(null);
+        //  this.setLocationRelativeTo(null);
         this.setLayout(null);
         this.setContentPane(panel);
         this.setResizable(false);
@@ -112,5 +141,9 @@ public class GamePlayFrame extends JFrame {
 
     public static String getChosenLevel() {
         return chosenLevel;
+    }
+
+    public static String getPlayerName() {
+        return playerName;
     }
 }

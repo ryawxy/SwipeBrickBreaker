@@ -24,8 +24,10 @@ public class Item extends Rectangle {
      this.height = height;
      this.feature = feature;
 
+
     }
     public static ArrayList<Item> getItems(){
+
         return items;
     }
 
@@ -72,16 +74,11 @@ public class Item extends Rectangle {
         this.feature = feature;
     }
 
-    public void addItem(){
-        int feature = rand.nextInt(6);
-        int x = rand.nextInt(300);
-        int y = rand.nextInt(300);
+    public void addItem(Item item){
 
-
-        Item item = new Item(x,y,10,10,feature);
         items.add(item);
 
-        System.out.println(item.getFeature());
+
     }
 
 
