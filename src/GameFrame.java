@@ -4,6 +4,7 @@ import java.awt.*;
 public class GameFrame  extends JFrame {
 
     GamePanel panel;
+    SoundPlayer soundPlayer;
     public GameFrame()  {
         GamePanel.setGameOver(false);
         Brick.getBricks().clear();
@@ -22,6 +23,21 @@ public class GameFrame  extends JFrame {
         this.pack();
         this.setVisible(true);
         GamePanel.setGameOver(false);
+
+//if(SettingsFrame.isSound()) {
+//    SoundPlayer.playSound("Hedwig_s-Theme.wav");
+//    try {
+//
+//        Thread.sleep(90000);
+//
+//        SoundPlayer.restartSound();
+//
+//    } catch (InterruptedException e) {
+//
+//        e.printStackTrace();
+//
+//    }
+//}
 
 
 

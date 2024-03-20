@@ -14,12 +14,13 @@ public class Brick extends Rectangle {
     private int number;
     private int feature;
     private int initialnum;
+    private int number2;
     private static final ArrayList<Brick> bricks = new ArrayList<>();
     private static final ArrayList<Brick> initialBricks = new ArrayList<>();
 
     Timer timer;
 
-    public Brick(int x,int y, double width, double height, int number, int feature,int initialnum) {
+    public Brick(int x,int y, double width, double height, int number, int feature,int initialnum,int number2) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -27,6 +28,7 @@ public class Brick extends Rectangle {
         this.number = number;
         this.feature = feature;
         this.initialnum  = initialnum;
+        this.number2 = number2;
 
     }
 
@@ -60,8 +62,8 @@ public class Brick extends Rectangle {
                 int x = rand.nextInt(400) + 100;
                 int num = rand.nextInt(Brick.getBricks().size() + 1);
                 int num2 = rand.nextInt(Brick.getBricks().size() + 1);
-                Brick.getBricks().add(new Brick(0, 0, 60, 40, num, rand.nextInt(8), num));
-                Brick.getBricks().add(new Brick(x, 0, 60, 40, num2, rand.nextInt(8), num2));
+                Brick.getBricks().add(new Brick(0, 0, 60, 40, num, rand.nextInt(8), num,num));
+                Brick.getBricks().add(new Brick(x, 0, 60, 40, num2, rand.nextInt(8), num2,num2));
 
 
             }
@@ -72,16 +74,16 @@ public class Brick extends Rectangle {
                 int num = rand.nextInt(Brick.getBricks().size() + 2);
                 int num2 = rand.nextInt(Brick.getBricks().size() + 2);
                 int num3 = rand.nextInt(Brick.getBricks().size() + 2);
-                Brick.getBricks().add(new Brick(0, 0, 60, 40, num, rand.nextInt(8), num));
-                Brick.getBricks().add(new Brick(x, 0, 60, 40, num2, rand.nextInt(10), num2));
-                Brick.getBricks().add(new Brick(x2, 0, 60, 40, num3, rand.nextInt(9), num3));
+                Brick.getBricks().add(new Brick(0, 0, 60, 40, num, rand.nextInt(8), num,num));
+                Brick.getBricks().add(new Brick(x, 0, 60, 40, num2, rand.nextInt(10), num2,num2));
+                Brick.getBricks().add(new Brick(x2, 0, 60, 40, num3, rand.nextInt(9), num3,num3));
 
             }
             case "easy" -> {
                 Random rand = new Random();
                 int x = rand.nextInt(500);
                 int num = rand.nextInt(Brick.getBricks().size() + 1);
-                Brick.getBricks().add(new Brick(x, 0, 60, 40, num, rand.nextInt(5), num));
+                Brick.getBricks().add(new Brick(x, 0, 60, 40, num, rand.nextInt(5), num,num));
             }
         }
     }
@@ -134,5 +136,13 @@ public class Brick extends Rectangle {
 
     public int getInitialnum() {
         return initialnum;
+    }
+
+    public int getNumber2() {
+        return number2;
+    }
+
+    public void setNumber2(int number2) {
+        this.number2 = number2;
     }
 }

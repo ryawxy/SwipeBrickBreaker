@@ -18,6 +18,9 @@ public class StarterFrame extends JFrame {
 
     public StarterFrame() throws FileNotFoundException {
 
+//        SettingsFrame.setSound(false);
+//        SettingsFrame.setSaving(false);
+//        SettingsFrame.setAiming(false);
         Brick.getBricks().clear();
         for (Brick brick1 : Brick.getInitialBricks()) {
             Brick.getBricks().add(brick1);

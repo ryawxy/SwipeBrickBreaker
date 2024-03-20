@@ -17,9 +17,13 @@ public class SoundTrack {
                 File file = new File(path);
                 File file2 = file.getAbsoluteFile();
                 String absPath = String.valueOf(file2);
-                if(filePath.equals(absPath)) {
+                if(filePath.equals(absPath) && SettingsFrame.isSound()) {
                     clip.loop(Clip.LOOP_CONTINUOUSLY);
+                    if(!SettingsFrame.isSound()){
+                        clip.stop();
+                    }
                 }
+
             } catch (Exception e) {
 
                 e.printStackTrace();

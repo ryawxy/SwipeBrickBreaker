@@ -11,18 +11,19 @@ public class Item extends Rectangle {
     private double width;
     private double height;
     private int feature;
-
+    private int feature2;
     private static final ArrayList<Item> items = new ArrayList<>();
 
     Random rand = new Random();
 
-    public Item(int x, int y, double width, double height, int feature ){
+    public Item(int x, int y, double width, double height, int feature, int feature2 ){
 
      this.x = x;
      this.y = y;
      this.width = width;
      this.height = height;
      this.feature = feature;
+     this.feature2 = feature2;
 
 
     }
@@ -78,8 +79,13 @@ public class Item extends Rectangle {
 
         items.add(item);
 
-
     }
 
+    public int getFeature2() {
+        return feature2;
+    }
 
+    public void setFeature2(int feature2) {
+        this.feature2 = feature2;
+    }
 }

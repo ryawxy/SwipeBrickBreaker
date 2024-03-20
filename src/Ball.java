@@ -11,23 +11,25 @@ public class Ball extends Rectangle {
 
     private int x;
     private int y;
+    private int number;
 
     private boolean collision = false;
 
     private static final ArrayList<Ball> balls = new ArrayList<>();
 
-    public Ball(int x,int y, int width, int height) {
+    public Ball(int x,int y, int width, int height,int number) {
 
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.number = number;
 
 
     }
 
     public static void setInitialBalls(){
-        balls.add(new Ball(150,590,10,10));
+        balls.add(new Ball(150,590,10,10,1));
 
     }
 
@@ -65,8 +67,11 @@ public class Ball extends Rectangle {
         y = y + yVelocity;
     }
 
-    public void draw(Graphics g){
-        g.setColor(Color.CYAN);
-        g.fillOval(x,y,width,height);
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 }
