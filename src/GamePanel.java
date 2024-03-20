@@ -115,7 +115,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     boolean explosion2 = false;
     int time7;
     int feature;
-
+    boolean hasPlayed = false;
 
 
 
@@ -440,7 +440,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         }
     }
 
-    public void moveBalls() throws InterruptedException {
+    public void moveBalls(Ball ball) throws InterruptedException {
 
 //        if (Ball.getBalls().size() > 1) {
 //            for (Ball ball : Ball.getBalls()) {
@@ -485,7 +485,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 //
 //            }
 //        }else{
-            for (Ball ball : Ball.getBalls()) {
+    //        for (Ball ball : Ball.getBalls()) {
 
                 Ball ball2 = Ball.getBalls().getFirst();
                 if (!pause) {
@@ -501,9 +501,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         }
                         if (dizzy) {
                             if(rand.nextInt(2)==0) {
-                                ballXDir = -1 * (rand.nextInt(7));
+                                ballXDir = -1 * (rand.nextInt(7)+10);
                             }else{
-                                ballXDir =  (rand.nextInt(7));
+                                ballXDir =  (rand.nextInt(7)+10);
                             }
                             ballYDir = (rand.nextInt(5))+3;
 
@@ -526,9 +526,10 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
                 }
 
+
          //       Thread.sleep(1);
 
-            }
+     //       }
         }
   //  }
 
@@ -647,32 +648,62 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         checkTurn();
                         moveBricks();
                         moveItems();
-                        try {
-                            checkCollision();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        try {
 
-                            moveBalls();
+                        hasPlayed();
 
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                        addBalls();
+
+
+
+                        java.util.Timer timer1 = new java.util.Timer();
+
+                        TimerTask task = new TimerTask() {
+                            int currentBall = 0;
+                            @Override
+                            public void run() {
+                                if(currentBall<Ball.getBalls().size()){
+                                    try {
+                                        moveBalls(Ball.getBalls().get(currentBall));
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    try {
+                                        checkCollision(Ball.getBalls().get(currentBall));
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    currentBall++;
+                                }else{
+                                    timer1.cancel();
+                                }
+                            }
+                        };
+                        timer1.scheduleAtFixedRate(task,0,90);
+
+                        firstOnGround();
+                        getTogether();
+//                        try {
+//                            checkCollision();
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        try {
+//
+//                            moveBalls();
+//
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
 
                         countScore();
-                        hasPlayed();
-                        addBalls();
+
+                //        addBalls();
 //                        firstOnGround();
 //                        getTogether();
 
                         gameOver();
 
-if(explosion2) {
-    System.out.println("trueeeeeeee");
-}
-
-
+                        System.out.println(Ball.getBalls().size());
 
                         if (elapsedTime >= FRAME_TIME) {
                             if (currentTime - timerr >= 1000) {
@@ -859,12 +890,13 @@ if(explosion2) {
         return allOnGround;
     }
 
-    public void checkCollision() throws InterruptedException {
+    public void checkCollision(Ball ball) throws InterruptedException {
 
 
-        for(int i=0;i<Brick.getBricks().size();i++) {
-            Brick brick = Brick.getBricks().get(i);
-            Ball ball = Ball.getBalls().getFirst();
+    //    for(int i=0; i<Ball.getBalls().size();i++){
+        for (int j = 0; j < Brick.getBricks().size(); j++) {
+            Brick brick = Brick.getBricks().get(j);
+      //      Ball ball = Ball.getBalls().get(i);
             if (brick.getNumber() > 0) {
                 Rectangle rect = new Rectangle(brick.getx(), brick.gety(), 60, 40);
                 Rectangle rect2 = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
@@ -874,65 +906,66 @@ if(explosion2) {
                     ballXDir = -1 * ballXDir;
                     ballYDir = -1 * ballYDir;
 
-                                            if (brick.getNumber() <= ball.getNumber()) {
-                                                numberofBricks += brick.getInitialnum();
-                                            }
-                            if (brick.getFeature() == 1 && brick.getNumber() <= ball.getNumber()) {
-                                earthquake = true;
+                    if (brick.getNumber() <= ball.getNumber()) {
+                        numberofBricks += brick.getInitialnum();
+                    }
+                    if (brick.getFeature() == 1 && brick.getNumber() <= ball.getNumber()) {
+                        earthquake = true;
 
 
-                            }
-                            if (brick.getFeature() == 2 && brick.getNumber() <= ball.getNumber()) {
-                                disco = true;
-                            }
-                            if (brick.getFeature() == 3 && brick.getNumber() <= ball.getNumber()) {
-                                bomb = true;
-                                x3 = brick.getx();
-                                y3 = brick.gety();
-                                explode = true;
-                                explosion2 = true;
-                            }
-                            if(!strength && !bomb){
-                                brick.setNumber(brick.getNumber()-ball.getNumber());
-                                brick.setNumber2(brick.getNumber2()-ball.getNumber());
-                            }
-                            if(strength && !bomb){
-                                brick.setNumber(brick.getNumber()-2*ball.getNumber());
-                                brick.setNumber2(brick.getNumber2()-2*ball.getNumber());
-                            }
-                            if(!strength && bomb){
-                                x = brick.getx();
-                            y = brick.gety();
-                      //      if (brick.getNumber() == 1) {
-                                explodedBricks.add(brick);
-                                brick.setNumber(brick.getNumber() - 50*Ball.getBalls().getFirst().getNumber());
-                                brick.setNumber2(brick.getNumber2() - 50*Ball.getBalls().getFirst().getNumber());
-                                for (int j = 0; j < Brick.getBricks().size(); j++) {
-                                    Brick brick1 = Brick.getBricks().get(j);
+                    }
+                    if (brick.getFeature() == 2 && brick.getNumber() <= ball.getNumber()) {
+                        disco = true;
+                    }
+                    if (brick.getFeature() == 3 && brick.getNumber() <= ball.getNumber()) {
+                        bomb = true;
+                        x3 = brick.getx();
+                        y3 = brick.gety();
+                        explode = true;
+                        explosion2 = true;
+                    }
+                    if (!strength && !bomb) {
+                        brick.setNumber(brick.getNumber() - ball.getNumber());
+                        brick.setNumber2(brick.getNumber2() - ball.getNumber());
+                    }
+                    if (strength && !bomb) {
+                        brick.setNumber(brick.getNumber() - 2 * ball.getNumber());
+                        brick.setNumber2(brick.getNumber2() - 2 * ball.getNumber());
+                    }
+                    if (!strength && bomb) {
+                        x = brick.getx();
+                        y = brick.gety();
+                        //      if (brick.getNumber() == 1) {
+                        explodedBricks.add(brick);
+                        brick.setNumber(brick.getNumber() - 50 * ball.getNumber());
+                        brick.setNumber2(brick.getNumber2() - 50 * ball.getNumber());
+                        for (int k = 0; k < Brick.getBricks().size(); k++) {
+                            Brick brick1 = Brick.getBricks().get(k);
 
-                                    if ((brick1.getx() >= x - 50 || brick1.getx() <= x + 50) &&
-                                            brick1.gety() >= y - 50 || brick1.gety() <= y + 50) {
-                                        explodedBricks.add(brick1);
-                                        numberofBricks += brick1.getInitialnum();
-                                        brick1.setNumber(brick1.getNumber() - 50 * Ball.getBalls().getFirst().getNumber());
-                                        brick1.setNumber2(brick1.getNumber2() - 50 * Ball.getBalls().getFirst().getNumber());
-                                        SoundTrack player = new SoundTrack();
-                                        String path = "explosion.wav";
-                                        File file = new File(path);
-                                        File file2 = file.getAbsoluteFile();
-                                        soundTrack.play(String.valueOf(file2));
-                                        bomb = false;
-                                        soundTrack.pause();
-                                    }
-                                }
-                                }
+                            if ((brick1.getx() >= x - 50 || brick1.getx() <= x + 50) &&
+                                    brick1.gety() >= y - 50 || brick1.gety() <= y + 50) {
+                                explodedBricks.add(brick1);
+                                numberofBricks += brick1.getInitialnum();
+                                brick1.setNumber(brick1.getNumber() - 50 * ball.getNumber());
+                                brick1.setNumber2(brick1.getNumber2() - 50 * ball.getNumber());
+                                SoundTrack player = new SoundTrack();
+                                String path = "explosion.wav";
+                                File file = new File(path);
+                                File file2 = file.getAbsoluteFile();
+                                soundTrack.play(String.valueOf(file2));
+                                bomb = false;
+                                soundTrack.pause();
                             }
-
-     //                   }
-
-
+                        }
+                    }
                 }
+
+                //                   }
+
+
             }
+        }
+//    }
 
 
 //        for (Ball ball : Ball.getBalls()) {
@@ -1025,16 +1058,16 @@ if(explosion2) {
 //        }
 
 
-        for (Ball ball : Ball.getBalls()) {
-            if (ball.getBallXPos() <= 2 || ball.getBallXPos() >= GAME_WIDTH - ballSize) {
+     //   for (Ball ball : Ball.getBalls()) {
+            if (ball.getBallXPos() <= 8 || ball.getBallXPos() >= GAME_WIDTH - ballSize+8) {
                 ballXDir = -1 * ballXDir;
             }
             if (ball.getBallYPose() <= 3) {
                 ballYDir = -1 * ballYDir;
-            }
+    //        }
 
         }
-        for (Ball ball : Ball.getBalls()) {
+  //      for (Ball ball : Ball.getBalls()) {
             for (Item item1 : Item.getItems()) {
                 if (item1.getFeature() <= 7 && item1.getFeature() > 0) {
                     Rectangle rect = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
@@ -1074,7 +1107,7 @@ if(explosion2) {
                 }
 
             }
-        }
+   //     }
     }
 
     @Override
@@ -1113,13 +1146,15 @@ if(explosion2) {
     }
 
     public boolean hasPlayed() {
-        boolean b = true;
+
         for (int i = 0; i < Ball.getBalls().size(); i++){
             Ball ball = Ball.getBalls().get(i);
-            if (ball.getBallYPose() >= 580 && hasReleased && hasDragged && b) {
+            if (ball.getBallYPose() >= 580 && hasReleased && hasDragged) {
 
                 x = ball.getBallXPos();
                 y = ball.getBallYPose();
+                hasPlayed  =true;
+
 //                if (!addBall) {
 //                //    Ball.getBalls().add(new Ball(x, y, 10, 10));
 //                    Ball.getBalls().getFirst().setNumber(Ball.getBalls().getFirst().getNumber()+1);
@@ -1207,47 +1242,48 @@ if(explosion2) {
             score = 0;
         }
     }
-//    public void getTogether() {
-//        boolean allOnGround = true;
-//        for (Ball ball : Ball.getBalls()) {
-//            if (ball.getBallYPose() < 580) {
-//                allOnGround = false;
-//                break;
-//            }
-//        }
-//        if(allOnGround){
-//            for(Ball ball1: Ball.getBalls()){
-//                ball1.setBallYPose(y2);
-//                ball1.setBallXPos(x2);
-//            }
-//        }
-//    }
-//
-//    public void firstOnGround(){
-//        for(Ball ball : Ball.getBalls()){
-//            if(ball.getBallYPose()>=580){
-//                x2 = ball.getBallXPos();
-//                y2 = ball.getBallYPose();
-//            }
-//        }
-//    }
+    public void getTogether() {
+        boolean allOnGround = true;
+        for (Ball ball : Ball.getBalls()) {
+            if (ball.getBallYPose() < 580) {
+                allOnGround = false;
+                break;
+            }
+        }
+        if(allOnGround){
+            for(Ball ball1: Ball.getBalls()){
+                ball1.setBallYPose(y2);
+                ball1.setBallXPos(x2);
+            }
+        }
+    }
+
+    public void firstOnGround(){
+        for(Ball ball : Ball.getBalls()){
+            if(ball.getBallYPose()>=580){
+                x2 = ball.getBallXPos();
+                y2 = ball.getBallYPose();
+            }
+        }
+    }
     public void addBalls(){
-        if(hasPlayed()){
+        if(hasPlayed){
             if (!addBall) {
-                //    Ball.getBalls().add(new Ball(x, y, 10, 10));
-                Ball.getBalls().getFirst().setNumber(Ball.getBalls().getFirst().getNumber()+1);
+                    Ball.getBalls().add(new Ball(x, y, 10, 10,1));
+             //   Ball.getBalls().getFirst().setNumber(Ball.getBalls().getFirst().getNumber()+1);
 
 
 
 
             } else {
-//                    Ball.getBalls().add(new Ball(x, y, 10, 10));
-//                    Ball.getBalls().add(new Ball(x, y, 10, 10));
-                Ball.getBalls().getFirst().setNumber(Ball.getBalls().getFirst().getNumber()+2);
+                    Ball.getBalls().add(new Ball(x, y, 10, 10,1));
+                    Ball.getBalls().add(new Ball(x, y, 10, 10,1));
+             //   Ball.getBalls().getFirst().setNumber(Ball.getBalls().getFirst().getNumber()+2);
                 addBall = false;
 
 
             }
+            hasPlayed = false;
         }
     }
 
