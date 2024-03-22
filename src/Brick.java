@@ -72,7 +72,7 @@ public class Brick extends Rectangle {
                 int x = rand.nextInt(250) + 300;
                 int x2 = rand.nextInt(100) + 70;
                 int num = rand.nextInt(Brick.getBricks().size() + 2);
-                int num2 = rand.nextInt(Brick.getBricks().size() + 2);
+                int num2 = rand.nextInt(Brick.getBricks().size() + 3);
                 int num3 = rand.nextInt(Brick.getBricks().size() + 2);
                 Brick.getBricks().add(new Brick(0, 0, 60, 40, num, rand.nextInt(8), num,num));
                 Brick.getBricks().add(new Brick(x, 0, 60, 40, num2, rand.nextInt(10), num2,num2));
@@ -83,7 +83,7 @@ public class Brick extends Rectangle {
                 Random rand = new Random();
                 int x = rand.nextInt(500);
                 int num = rand.nextInt(Brick.getBricks().size() + 1);
-                Brick.getBricks().add(new Brick(x, 0, 60, 40, num, rand.nextInt(5), num,num));
+                Brick.getBricks().add(new Brick(x, 0, 60, 40, num, rand.nextInt(7), num,num));
             }
         }
     }

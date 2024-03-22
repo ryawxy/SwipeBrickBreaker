@@ -12,11 +12,12 @@ public class Item extends Rectangle {
     private double height;
     private int feature;
     private int feature2;
+    private boolean collide;
     private static final ArrayList<Item> items = new ArrayList<>();
 
     Random rand = new Random();
 
-    public Item(int x, int y, double width, double height, int feature, int feature2 ){
+    public Item(int x, int y, double width, double height, int feature, int feature2,boolean collide ){
 
      this.x = x;
      this.y = y;
@@ -24,6 +25,7 @@ public class Item extends Rectangle {
      this.height = height;
      this.feature = feature;
      this.feature2 = feature2;
+     this.collide = collide;
 
 
     }
@@ -87,5 +89,13 @@ public class Item extends Rectangle {
 
     public void setFeature2(int feature2) {
         this.feature2 = feature2;
+    }
+
+    public boolean isCollide() {
+        return collide;
+    }
+
+    public void setCollide(boolean collide) {
+        this.collide = collide;
     }
 }

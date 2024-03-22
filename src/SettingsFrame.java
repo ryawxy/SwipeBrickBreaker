@@ -79,9 +79,7 @@ public class SettingsFrame extends JFrame {
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(themeSong.isSelected()){
-                    sound = true;
-                }
+                sound = themeSong.isSelected();
                 if(save.isSelected()){
                     saving = true;
                 }

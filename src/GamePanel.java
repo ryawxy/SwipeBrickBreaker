@@ -1,3 +1,5 @@
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
@@ -11,7 +13,7 @@ import java.util.logging.Handler;
 
 
 
-public class GamePanel extends JPanel implements ActionListener, MouseListener, Runnable, MouseMotionListener {
+public class GamePanel extends JPanel implements ActionListener, MouseListener, Runnable, MouseMotionListener, LineListener {
 
     static final int GAME_WIDTH = 700;
     static final int GAME_HEIGHT = 600;
@@ -73,7 +75,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     Random rand = new Random();
     int timeLeft2;
     int endTurn = 0;
-    Item item = new Item(0, 0, 0, 0, 0,0);
+    Item item = new Item(0, 0, 0, 0, 0,0,false);
     int itemSize = 30;
     boolean speed = false;
     int timeLeft4 = 0;
@@ -116,6 +118,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     int time7;
     int feature;
     boolean hasPlayed = false;
+    int soundCheck;
+    int delay = 0;
+
 
 
 
@@ -160,7 +165,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
             public void actionPerformed(ActionEvent e) {
                 if (!turn && !pause && !gameOver) {
                     if(GamePlayFrame.getChosenLevel().equals("easy")) {
-                         feature = rand.nextInt(10);
+                         feature = rand.nextInt(11);
                     }if(GamePlayFrame.getChosenLevel().equals("medium")) {
                         feature = rand.nextInt(15);
                     }if(GamePlayFrame.getChosenLevel().equals("hard")) {
@@ -172,11 +177,11 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
                     if(feature == 6) {
                         if (!used) {
-                            Item.getItems().add(new Item(x, y, 10, 10, feature,feature));
+                            Item.getItems().add(new Item(x, y, 10, 10, feature,feature,false));
                             used = true;
                         }
                     }else{
-                        Item.getItems().add(new Item(x, y, 10, 10, feature,feature));
+                        Item.getItems().add(new Item(x, y, 10, 10, feature,feature,false));
                     }
                     repaint();
                 }
@@ -184,14 +189,6 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         });
         timer3.start();
 
-//        if(SettingsFrame.isSound()){
-//            String path = "Hedwig_s-Theme.wav";
-//            File file = new File(path);
-//            File file2 = file.getAbsoluteFile();
-//            if(!gameOver) {
-//                soundTrack.play(String.valueOf(file2));
-//            }
-//        }
         pauseGame = new JButton("Pause");
         pauseGame.setBounds(560,500,50,50);
         this.add(pauseGame);
@@ -208,41 +205,21 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
             }
         });
-
-//        if(showDialog) {
-//            timer2 = new Timer(100, new ActionListener() {
-//
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    if (gameOver) {
-//                        if(showDialog) {
-//                            JOptionPane.showMessageDialog(GamePanel.this, "Game over :(\n score: " + score);
-//
-//                            GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
-//                            if (parent != null) {
-//                                parent.dispose();
-//                                timer2.setRepeats(false);
-//                                showDialog = false;
-//                                gameOver = false;
-//                                new StarterFrame();
-//
-//
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-//            timer2.start();
-//        }
-
+        timer10 = new Timer(10000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int x = rand.nextInt(300);
+                int y = rand.nextInt(300);
+                Item.getItems().add(new Item(x,y,10,10,1,1,false));
+            }
+        });
+        timer10.start();
 
     }
 
     protected void paintComponent(Graphics g) {
 
         super.paintComponent(g);
-        //   draw(g);
-
 
         if (earthquake) {
             DELTA_Y = 1;
@@ -278,12 +255,13 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
 
         }
+        //draw explosion effect
         if(explosion2){
 
             image = new ImageIcon("untitled.png").getImage();
 
             g.drawImage(image,x3-70,y3-60,GamePanel.this);
-        //    explosion2 = false;
+
         }
         //balls
         String color = GamePlayFrame.getColor();
@@ -328,28 +306,31 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         //draw items
 
         for (Item item1 : Item.getItems()) {
-            if (item1.getFeature() <= 7 && item1.getFeature() > 0) {
-                if (disco) {
-                    color1 = new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150));
-                    g.setColor(color1);
-                }else {
-                    if (item1.getFeature() == 1 || item1.getFeature()== 7) {
-                        g.setColor(new Color(160, 32, 200));
-                    } else if (item1.getFeature() == 2) {
-                        g.setColor(new Color(255, 151, 215));
-                    } else if (item1.getFeature() == 3) {
-                        g.setColor(new Color(175, 193, 255));
+            if(!item1.isCollide()) {
+                if (item1.getFeature() <= 10 && item1.getFeature() > 0) {
+                    if (disco) {
+                        color1 = new Color(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150));
+                        g.setColor(color1);
+                    } else {
+                        if (item1.getFeature() == 1 || item1.getFeature() == 7 || item1.getFeature() == 8 || item1.getFeature() == 9
+                    || item1.getFeature() == 10) {
+                            g.setColor(new Color(160, 32, 200));
+                        } else if (item1.getFeature() == 2) {
+                            g.setColor(new Color(255, 151, 215));
+                        } else if (item1.getFeature() == 3) {
+                            g.setColor(new Color(175, 193, 255));
 
-                    } else if (item1.getFeature() == 4) {
-                        g.setColor(new Color(255, 165, 51));
-                    } else if (item1.getFeature() == 5) {
-                        g.setColor(Color.BLACK);
-                    } else if (item1.getFeature() == 6 && !used) {
-                        g.setColor(new Color(100, 50, 50));
+                        } else if (item1.getFeature() == 4) {
+                            g.setColor(new Color(255, 165, 51));
+                        } else if (item1.getFeature() == 5) {
+                            g.setColor(Color.BLACK);
+                        } else if (item1.getFeature() == 6 && !used) {
+                            g.setColor(new Color(100, 50, 50));
 
+                        }
                     }
+                    g.fillOval(item1.getx(), item1.gety(), itemSize, itemSize);
                 }
-                g.fillOval(item1.getx(), item1.gety(), itemSize, itemSize);
             }
         }
 
@@ -501,11 +482,11 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         }
                         if (dizzy) {
                             if(rand.nextInt(2)==0) {
-                                ballXDir = -1 * (rand.nextInt(7)+10);
+                                ballXDir = -1 * (rand.nextInt(7)+15);
                             }else{
-                                ballXDir =  (rand.nextInt(7)+10);
+                                ballXDir =  (rand.nextInt(7)+15);
                             }
-                            ballYDir = (rand.nextInt(5))+3;
+                            ballYDir = (rand.nextInt(5))+15;
 
 
                         }
@@ -537,7 +518,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        moveBricks();
+    //    moveBricks();
         //  moveBalls();
         // checkCollision();
         repaint();
@@ -591,20 +572,25 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                     brick1.setNumber(0);
                 }
             }
-//            for(Item item1 : Item.getItems()){
-//                int x = rand.nextInt(10);
-//                if(x == 1){
-//                    item1.setFeature(10);
-//                }
-//            }
+            for (Item item1 : Item.getItems()) {
+                if (!item1.isCollide()){
+                    int x = rand.nextInt(10);
+                if (x == 1) {
+                    item1.setFeature(10);
+                }
+            }
+        }
         }
         else{
             for(Brick brick1 : Brick.getBricks()){
                 brick1.setNumber(brick1.getNumber2());
             }
-//            for(Item item1 : Item.getItems()){
-//                item1.setFeature(item1.getFeature2());
-//            }
+
+                for (Item item1 : Item.getItems()) {
+                    if (!item1.isCollide()) {
+                    item1.setFeature(item1.getFeature2());
+                }
+            }
 
         }
     }
@@ -624,14 +610,6 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
             long lastFrameTime = System.currentTimeMillis();
 
-            if(SettingsFrame.isSound()){
-                String path = "Hedwig_s-Theme.wav";
-                File file = new File(path);
-                File file2 = file.getAbsoluteFile();
-                if(!gameOver) {
-                    soundTrack.play(String.valueOf(file2));
-                }
-            }
 
 
 
@@ -642,8 +620,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
                 long currentTime = System.currentTimeMillis();
                 long elapsedTime = currentTime - lastFrameTime;
+                if(!pause){
                 if (delta >= 1) {
-                    if (!pause && !gameOver ) {
+                    if (!pause && !gameOver) {
 
                         checkTurn();
                         moveBricks();
@@ -654,56 +633,54 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         addBalls();
 
 
-
                         java.util.Timer timer1 = new java.util.Timer();
 
+                        if (hasDragged && hasReleased) {
+                            delay++;
+                        }
                         TimerTask task = new TimerTask() {
                             int currentBall = 0;
+
+
                             @Override
                             public void run() {
-                                if(currentBall<Ball.getBalls().size()){
+                                if (currentBall < Ball.getBalls().size()) {
+
+
                                     try {
                                         moveBalls(Ball.getBalls().get(currentBall));
                                     } catch (InterruptedException e) {
                                         throw new RuntimeException(e);
                                     }
+
                                     try {
                                         checkCollision(Ball.getBalls().get(currentBall));
                                     } catch (InterruptedException e) {
                                         throw new RuntimeException(e);
                                     }
+
+
                                     currentBall++;
-                                }else{
+
+
+                                } else {
                                     timer1.cancel();
                                 }
                             }
                         };
-                        timer1.scheduleAtFixedRate(task,0,90);
+
+                        timer1.scheduleAtFixedRate(task, 0, 100);
 
                         firstOnGround();
                         getTogether();
-//                        try {
-//                            checkCollision();
-//                        } catch (InterruptedException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                        try {
-//
-//                            moveBalls();
-//
-//                        } catch (InterruptedException e) {
-//                            throw new RuntimeException(e);
-//                        }
+
 
                         countScore();
 
-                //        addBalls();
-//                        firstOnGround();
-//                        getTogether();
+
 
                         gameOver();
 
-                        System.out.println(Ball.getBalls().size());
 
                         if (elapsedTime >= FRAME_TIME) {
                             if (currentTime - timerr >= 1000) {
@@ -747,19 +724,29 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             timeLeft5 = 0;
                             strength = false;
                         }
-                        if (explosion2){
+                        if (explosion2) {
                             time7++;
                         }
-                        if(time7>40){
+                        if (time7 > 40) {
                             explosion2 = false;
                             time7 = 0;
                         }
-
+                        if (SettingsFrame.isSound()) {
+                            soundCheck++;
+                        }
+                        if (soundCheck > 5580) {
+                            SoundPlayer.stopSound();
+                            SoundPlayer.restartSound();
+                            soundCheck = 0;
+                        }
 
 
                         if (gameOver) {
 
 
+                            timer.stop();
+                            timer3.stop();
+                            timer10.stop();
                             FileWriter fw = null;
                             try {
                                 fw = new FileWriter("highestScore.txt", true);
@@ -768,7 +755,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             }
                             BufferedWriter bw = new BufferedWriter(fw);
                             try {
-                                bw.write(score+"/");
+                                bw.write(score + "/");
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -780,7 +767,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             }
 
 
-                            if(SettingsFrame.isSaving()) {
+                            if (SettingsFrame.isSaving()) {
                                 FileWriter fw1 = null;
                                 try {
                                     fw1 = new FileWriter("data.txt", true);
@@ -807,7 +794,6 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             }
 
 
-
                             JOptionPane.showMessageDialog(GamePanel.this, "Game over :(\n score: " + score);
                             //    gameOver = false;
                             int choice2 = JOptionPane.showOptionDialog(GamePanel.this,
@@ -819,14 +805,14 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
 
                             if (choice2 == 2) {
-                                SettingsFrame.setAiming(false);
-                                SettingsFrame.setSaving(false);
-                                SettingsFrame.setSound(false);
+                                SoundPlayer.stopSound();
+
+
 
                                 // repaint();
                                 GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
                                 if (parent != null) {
-                                       parent.remove(GamePanel.this);
+                                    parent.remove(GamePanel.this);
                                     parent.dispose();
                                     try {
                                         new StarterFrame();
@@ -835,29 +821,27 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                                     }
                                     break;
                                 }
-//
-//                                seconds = 0;
-//                                score = 0;
-
-                                //               new StarterFrame();
-                                //    break;
 
 
                             }
-                            if(choice2 == 1) {
+                            if (choice2 == 1) {
+
                                 GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
                                 if (parent != null) {
                                     parent.remove(GamePanel.this);
                                     parent.dispose();
+                                    //    SoundPlayer.stopSound();
                                     new GamePlayFrame();
                                     break;
                                 }
                             }
-                            if(choice2 == 0){
+                            if (choice2 == 0) {
+
                                 GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
                                 if (parent != null) {
                                     parent.remove(GamePanel.this);
                                     parent.dispose();
+                                    //       SoundPlayer.stopSound();
                                     new GameFrame();
                                     break;
                                 }
@@ -872,7 +856,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         repaint();
                         delta--;
                     }
-
+                }
                 }
             }
         }
@@ -893,10 +877,10 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     public void checkCollision(Ball ball) throws InterruptedException {
 
 
-    //    for(int i=0; i<Ball.getBalls().size();i++){
+        //    for(int i=0; i<Ball.getBalls().size();i++){
         for (int j = 0; j < Brick.getBricks().size(); j++) {
             Brick brick = Brick.getBricks().get(j);
-      //      Ball ball = Ball.getBalls().get(i);
+            //      Ball ball = Ball.getBalls().get(i);
             if (brick.getNumber() > 0) {
                 Rectangle rect = new Rectangle(brick.getx(), brick.gety(), 60, 40);
                 Rectangle rect2 = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
@@ -954,7 +938,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                                 File file2 = file.getAbsoluteFile();
                                 soundTrack.play(String.valueOf(file2));
                                 bomb = false;
-                                soundTrack.pause();
+                                //   soundTrack.pause();
                             }
                         }
                     }
@@ -1050,7 +1034,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 //                            }
 //                        }
 //
-                        repaint();
+        repaint();
 //
 //                    }
 //                }
@@ -1058,18 +1042,19 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 //        }
 
 
-     //   for (Ball ball : Ball.getBalls()) {
-            if (ball.getBallXPos() <= 8 || ball.getBallXPos() >= GAME_WIDTH - ballSize+8) {
-                ballXDir = -1 * ballXDir;
-            }
-            if (ball.getBallYPose() <= 3) {
-                ballYDir = -1 * ballYDir;
-    //        }
+        //   for (Ball ball : Ball.getBalls()) {
+        if (ball.getBallXPos() <= 8 || ball.getBallXPos() >= GAME_WIDTH - ballSize + 8) {
+            ballXDir = -1 * ballXDir;
+        }
+        if (ball.getBallYPose() <= 3) {
+            ballYDir = -1 * ballYDir;
+            //        }
 
         }
-  //      for (Ball ball : Ball.getBalls()) {
-            for (Item item1 : Item.getItems()) {
-                if (item1.getFeature() <= 7 && item1.getFeature() > 0) {
+        //      for (Ball ball : Ball.getBalls()) {
+        for (Item item1 : Item.getItems()) {
+            if (!item1.isCollide()){
+                if (item1.getFeature() <= 10 && item1.getFeature() > 0) {
                     Rectangle rect = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
                     Rectangle rect2 = new Rectangle(item1.getx(), item1.gety(), itemSize, itemSize);
 
@@ -1077,7 +1062,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         ballXDir = -1 * ballXDir;
                         ballYDir = -1 * ballYDir;
 
-                        if(item1.getFeature() == 1 || item1.getFeature() == 7){
+                        if (item1.getFeature() == 1 || item1.getFeature() == 7) {
                             addBall = true;
                             item1.setFeature(10);
                         }
@@ -1098,15 +1083,18 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         if (item1.getFeature() == 5) {
                             goUP = true;
                             item1.setFeature(10);
-                        }  if (item1.getFeature() == 6) {
+                        }
+                        if (item1.getFeature() == 6) {
                             extraLive = true;
                             item1.setFeature(10);
                         }
+                        item1.setCollide(true);
                     }
                     repaint();
                 }
 
-            }
+        }
+    }
    //     }
     }
 
@@ -1147,13 +1135,15 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
     public boolean hasPlayed() {
 
+
         for (int i = 0; i < Ball.getBalls().size(); i++){
             Ball ball = Ball.getBalls().get(i);
             if (ball.getBallYPose() >= 580 && hasReleased && hasDragged) {
 
                 x = ball.getBallXPos();
                 y = ball.getBallYPose();
-                hasPlayed  =true;
+                hasPlayed = true;
+
 
 //                if (!addBall) {
 //                //    Ball.getBalls().add(new Ball(x, y, 10, 10));
@@ -1194,7 +1184,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
     public void gameOver(){
         for(Brick brick1 : Brick.getBricks()) {
             if (brick1.getNumber() > 0) {
-                if (brick1.gety() >= 570) {
+                if (brick1.gety() >= 563) {
                     if (!extraLive) {
                         gameOver = true;
                     }
@@ -1217,11 +1207,6 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         }
 
 
-    }
-
-
-    public static boolean isGameOver() {
-        return gameOver;
     }
 
     public static void setGameOver(boolean gameOver) {
@@ -1287,7 +1272,14 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         }
     }
 
-
+    @Override
+    public void update(LineEvent event) {
+        if(event.getType()==LineEvent.Type.STOP){
+            if(SettingsFrame.isSound()) {
+                SoundPlayer.playSound("Hedwig_s-Theme.wav");
+            }
+        }
+    }
 }
 
 

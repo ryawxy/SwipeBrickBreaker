@@ -109,22 +109,30 @@ public class StarterFrame extends JFrame {
 
 
             if (scores.length > 0) {
-
-                int max = Integer.parseInt(scores[0]);
-                for (String string : scores) {
-                    if (max < Integer.parseInt(string)) {
-                        max = Integer.parseInt(string);
+                try {
+                    int max = Integer.parseInt(scores[0]);
+                    for (String string : scores) {
+                        if (max < Integer.parseInt(string)) {
+                            max = Integer.parseInt(string);
+                        }
                     }
-                }
 
-                score = new JButton("highest score:" + max);
-                score.setBounds(80, 500, 150, 50);
-                panel.add(score);
+                    score = new JButton("highest score:" + max);
+                    score.setBounds(80, 500, 150, 50);
+                    panel.add(score);
+                }catch (NumberFormatException e){
+                    
+                }
             }
         }
 
         this.setIconImage(new ImageIcon("logo.png").getImage());
 
+        if(SettingsFrame.isSound()){
+            SoundPlayer.playSound("Hedwig_s-Theme.wav");
+        }else{
 
+            SoundPlayer.stopSound();
+        }
     }
 }
