@@ -13,7 +13,7 @@ import java.util.logging.Handler;
 
 
 
-public class GamePanel extends JPanel implements ActionListener, MouseListener, Runnable, MouseMotionListener, LineListener {
+public class GamePanel extends JPanel implements ActionListener, MouseListener, Runnable, MouseMotionListener {
 
     static final int GAME_WIDTH = 700;
     static final int GAME_HEIGHT = 600;
@@ -1272,14 +1272,15 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         }
     }
 
-    @Override
-    public void update(LineEvent event) {
-        if(event.getType()==LineEvent.Type.STOP){
-            if(SettingsFrame.isSound()) {
-                SoundPlayer.playSound("Hedwig_s-Theme.wav");
-            }
-        }
-    }
+ //   @Override
+//    public void update(LineEvent event) {
+//        if(event.getType()==LineEvent.Type.STOP){
+//            System.out.println(1111);
+//            if(SettingsFrame.isSound()) {
+//                SoundPlayer.playSound("Hedwig_s-Theme.wav");
+//            }
+//        }
+//    }
 }
 
 

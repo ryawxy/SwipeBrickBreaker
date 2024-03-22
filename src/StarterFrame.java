@@ -1,3 +1,5 @@
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class StarterFrame extends JFrame {
+public class StarterFrame extends JFrame  {
 
     StarterPanel panel;
     JButton startButton;
@@ -15,8 +17,9 @@ public class StarterFrame extends JFrame {
     JButton settings;
     JButton recent;
     JButton score;
+    int delay;
 
-    public StarterFrame() throws FileNotFoundException {
+    public StarterFrame() throws FileNotFoundException  {
 
 //        SettingsFrame.setSound(false);
 //        SettingsFrame.setSaving(false);
@@ -52,6 +55,7 @@ public class StarterFrame extends JFrame {
                 }
                 Item.getItems().clear();
                 GamePanel.setGameOver(false);
+
                 dispose();
 
                 new GamePlayFrame();
@@ -134,5 +138,33 @@ public class StarterFrame extends JFrame {
 
             SoundPlayer.stopSound();
         }
+//        Timer timer = new Timer(1000, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                delay++;
+//                System.out.println(delay);
+//                if(delay == 93){
+//                    SoundPlayer.restartSound();
+//                    delay = 0;
+//                }
+//            }
+//        });
+//        if(SettingsFrame.isSound()) {
+//            timer.start();
+//        }
+//        if(delay == 3){
+//            System.out.println(111);
+//            SoundPlayer.restartSound();
+//            delay = 0;
+//        }
     }
+//    @Override
+//    public void update(LineEvent event) {
+//        if(event.getType()==LineEvent.Type.STOP){
+//            System.out.println(111111);
+//            if(SettingsFrame.isSound()) {
+//                SoundPlayer.playSound("Hedwig_s-Theme.wav");
+//            }
+//        }
+//    }
 }

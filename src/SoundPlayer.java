@@ -13,6 +13,7 @@ public class SoundPlayer implements LineListener {
             clip = AudioSystem.getClip();
             clip.open(AudioSystem.getAudioInputStream(soundFile));
             clip.start();
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
             e.printStackTrace();
 
@@ -48,6 +49,7 @@ public class SoundPlayer implements LineListener {
     public void update(LineEvent event) {
         if(event.getType()==LineEvent.Type.STOP){
             if(SettingsFrame.isSound()) {
+                clip.setMicrosecondPosition(0);
                 playSound("Hedwig_s-Theme.wav");
             }
         }
