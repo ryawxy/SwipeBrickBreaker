@@ -826,6 +826,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             }
                             if (choice2 == 1) {
 
+
                                 GameFrame parent = (GameFrame) SwingUtilities.getWindowAncestor(GamePanel.this);
                                 if (parent != null) {
                                     parent.remove(GamePanel.this);
