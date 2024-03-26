@@ -1032,7 +1032,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
             Brick brick = Brick.getBricks().get(j);
             //      Ball ball = Ball.getBalls().get(i);
             if (brick.getNumber() > 0) {
-                Rectangle rect = new Rectangle(brick.getx(), brick.gety(), 60, 40);
+                Rectangle rect = new Rectangle(brick.getx(), brick.gety(), (int) brick.getW(), (int) brick.getH());
                 Rectangle rect2 = new Rectangle(ball.getBallXPos(), ball.getBallYPose(), ballSize, ballSize);
 
                 if (rect.intersects(rect2)) {
