@@ -413,7 +413,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
 
         if (!pause) {
-            if (hasPlayed() && !goUP && b ) {
+            if (hasPlayed() && !goUP  ) {
 
                 for (Brick brick1 : Brick.getBricks()) {
                     brick1.setY(brick1.gety() + 60);
