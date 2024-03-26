@@ -178,7 +178,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         feature = rand.nextInt(15);
                     }
                     if (GamePlayFrame.getChosenLevel().equals("hard")) {
-                        feature = rand.nextInt(20);
+                        feature = rand.nextInt(18);
                     }
 
                     int x = rand.nextInt(300);
@@ -194,7 +194,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         }
                     }
 
-                    if (hasReleased && hasDragged && b && hasPlayed()) {
+                    if ( b && !hasPlayed) {
                         if (feature == 6) {
                             if (!used) {
                                 Item.getItems().add(new Item(x, y, 10, 10, feature, feature, false));
@@ -226,12 +226,23 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
             }
         });
-        timer10 = new Timer(10000, new ActionListener() {
+        timer10 = new Timer(5000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                 boolean b = true;
+
+                    for(int i=0;i<Ball.getBalls().size();i++){
+                        Ball ball = Ball.getBalls().get(i);
+                        if (ball.getBallYPose() < 580) {
+                            b = false;
+                            break;
+                        }
+                    }
                 int x = rand.nextInt(300);
                 int y = rand.nextInt(300);
+                if(!hasPlayed && b){
                 Item.getItems().add(new Item(x,y,10,10,1,1,false));
+                }
             }
         });
         timer10.start();
