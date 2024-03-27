@@ -194,7 +194,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         }
                     }
 
-                    if ( b && !hasPlayed) {
+                    if ( !hasPlayed && b) {
                         if (feature == 6) {
                             if (!used) {
                                 Item.getItems().add(new Item(x, y, 10, 10, feature, feature, false));
@@ -229,23 +229,24 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
         timer10 = new Timer(5000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                 boolean b = true;
+                boolean b = true;
 
-                    for(int i=0;i<Ball.getBalls().size();i++){
-                        Ball ball = Ball.getBalls().get(i);
-                        if (ball.getBallYPose() < 580) {
-                            b = false;
-                            break;
-                        }
+                for(int i=0;i<Ball.getBalls().size();i++){
+                    Ball ball = Ball.getBalls().get(i);
+                    if (ball.getBallYPose() < 580) {
+                        b = false;
+                        break;
                     }
+                }
                 int x = rand.nextInt(300);
                 int y = rand.nextInt(300);
-                if(!hasPlayed && b){
-                Item.getItems().add(new Item(x,y,10,10,1,1,false));
+                if( !hasPlayed && b) {
+                    Item.getItems().add(new Item(x, y, 10, 10, 1, 1, false));
                 }
             }
         });
         timer10.start();
+        
 
     }
 
@@ -428,11 +429,11 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
                 for (Brick brick1 : Brick.getBricks()) {
                     brick1.setY(brick1.gety() + 60);
-//                    hasReleased = false;
-//                    hasDragged = false;
-                }
                     hasReleased = false;
                     hasDragged = false;
+                }
+//                    hasReleased = false;
+//                    hasDragged = false;
                     goUP = false;
 
             }
@@ -740,10 +741,12 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             }
                             moveItems();
 
+                       //     addBalls();
                             hasPlayed();
 
                             addBalls();
 
+                            
 
 
 
@@ -788,10 +791,13 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             timer1.scheduleAtFixedRate(task, 0, 100);
                             //      stopBall();
 
+                          //  addBalls();
 
                             firstOnGround();
-                            stopBall();
+                          //  addBalls();
+                      //      stopBall();
                             getTogether();
+                      //      addBalls();
 
 //                            if(hasPlayed()) {
 //                                Ball ball;
@@ -887,6 +893,10 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                                 dizzy= false;
                                 shootRandom = 0;
                             }
+                            if(hasDragged && hasReleased && hasPlayed()){
+                                add=1;
+                            }
+
 //                            if(goUP){
 //                                timer15++;
 //                            }
@@ -1077,7 +1087,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                         brick.setNumber(brick.getNumber() - 2 * ball.getNumber());
                         brick.setNumber2(brick.getNumber2() - 2 * ball.getNumber());
                     }
-                    if (!strength && bomb) {
+                    if (bomb) {
                         x = brick.getx();
                         y = brick.gety();
                         //      if (brick.getNumber() == 1) {
@@ -1089,10 +1099,11 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
 
                             if ((brick1.getx() >= x - 30 || brick1.getx() <= x + 30) &&
                                     brick1.gety() >= y - 30 || brick1.gety() <= y + 30) {
+                       //         if(brick1.getx()!=x && brick1.gety()!=y){
                                 explodedBricks.add(brick1);
-                                 if(brick1.getNumber()-50<=0) {
-                                numberofBricks += brick1.getInitialnum();
-                                 }
+                                if(brick1.getNumber()-50<=0) {
+                                    numberofBricks += brick1.getInitialnum();
+                                }
                                 brick1.setNumber(brick1.getNumber() - 50 * ball.getNumber());
                                 brick1.setNumber2(brick1.getNumber2() - 50 * ball.getNumber());
                                 SoundTrack player = new SoundTrack();
@@ -1102,7 +1113,8 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                                 soundTrack.play(String.valueOf(file2));
                                 bomb = false;
                                 //   soundTrack.pause();
-                            }
+                     //       }
+                        }
                         }
                     }
                 }
@@ -1440,7 +1452,7 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                 Ball.getBalls().add(new Ball(x, y, 10, 10, 1,0,0));
             }
             hasPlayed = false;
-            add=1;
+         //   add=1;
         }
     }
     public void stopBall(){
