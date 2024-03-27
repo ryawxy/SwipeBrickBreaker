@@ -80,12 +80,8 @@ public class SettingsFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sound = themeSong.isSelected();
-                if(save.isSelected()){
-                    saving = true;
-                }
-                if(aim.isSelected()){
-                    aiming = true;
-                }
+                 saving = save.isSelected();
+                aiming = aim.isSelected();
                 dispose();
                 try {
                     new StarterFrame();
