@@ -1090,7 +1090,9 @@ public class GamePanel extends JPanel implements ActionListener, MouseListener, 
                             if ((brick1.getx() >= x - 30 || brick1.getx() <= x + 30) &&
                                     brick1.gety() >= y - 30 || brick1.gety() <= y + 30) {
                                 explodedBricks.add(brick1);
+                                 if(brick1.getNumber()-50<=0) {
                                 numberofBricks += brick1.getInitialnum();
+                                 }
                                 brick1.setNumber(brick1.getNumber() - 50 * ball.getNumber());
                                 brick1.setNumber2(brick1.getNumber2() - 50 * ball.getNumber());
                                 SoundTrack player = new SoundTrack();
